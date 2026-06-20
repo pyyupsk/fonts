@@ -1,0 +1,28 @@
+{
+  "name": "@fonts/db",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./schema/licenses": "./src/schema/licenses.ts",
+    "./schema/subsets": "./src/schema/subsets.ts",
+    "./schema/families": "./src/schema/families.ts",
+    "./schema/family-subsets": "./src/schema/family-subsets.ts",
+    "./schema/variants": "./src/schema/variants.ts",
+    "./schema/files": "./src/schema/files.ts"
+  },
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply fonts-db --local",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.0"
+  },
+  "devDependencies": {
+    "@fonts/tsconfig": "workspace:*",
+    "drizzle-kit": "^0.31.0",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.0.0"
+  }
+}

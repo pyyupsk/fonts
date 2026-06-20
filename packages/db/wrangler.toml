@@ -1,0 +1,8 @@
+name = "fonts-db-migrations"
+compatibility_date = "2025-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "fonts-db"
+database_id = "local-dev"
+migrations_dir = "drizzle"
