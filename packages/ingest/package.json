@@ -1,0 +1,14 @@
+{
+  "name": "@fonts/ingest",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "ingest:family": "bun run src/cli.ts"
+  },
+  "devDependencies": {
+    "@fonts/tsconfig": "workspace:*",
+    "@types/bun": "^1.3.14",
+    "typescript": "^5.9.0"
+  }
+}
