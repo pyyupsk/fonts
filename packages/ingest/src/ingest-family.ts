@@ -6,7 +6,7 @@ import { parseMetadata } from "./parse-metadata";
 const FONTS_DATA_ROOT = join(import.meta.dirname, "../../fonts");
 
 function sqlString(value: string): string {
-  return `'${value.replace(/'/g, "''")}'`;
+  return `'${value.replaceAll("'", "''")}'`;
 }
 
 export async function buildIngestSql(license: "ofl" | "apache" | "ufl", familyDir: string): Promise<string> {

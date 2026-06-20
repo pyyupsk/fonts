@@ -1,8 +1,13 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { convertFamilyFiles } from "./convert-and-upload";
 import { buildIngestSql } from "./ingest-family";
 
 const OUT_DIR = join(import.meta.dirname, "../.out");
+
+function sqlString(value: string): string {
+  return `'${value.replaceAll("'", "''")}'`;
+}
 
 const SEED_LICENSES_SQL = `
 INSERT INTO licenses (id, name, url) VALUES ('ofl', 'SIL Open Font License', 'https://scripts.sil.org/OFL') ON CONFLICT (id) DO NOTHING;
@@ -19,7 +24,17 @@ if (!familyDir) {
 }
 
 const familySql = await buildIngestSql(license, familyDir);
-const sql = `${SEED_LICENSES_SQL}\n${familySql}\n`;
+const converted = await convertFamilyFiles(license, familyDir);
+
+const filesSql = converted
+  .map(
+    (file) => `INSERT INTO files (id, variant_id, format, r2_key, file_size, checksum_sha256)
+     VALUES (${sqlString(`${file.variantId}-woff2`)}, ${sqlString(file.variantId)}, 'woff2', ${sqlString(file.r2Key)}, ${file.fileSize}, ${sqlString(file.checksumSha256)})
+     ON CONFLICT (id) DO UPDATE SET r2_key=excluded.r2_key, file_size=excluded.file_size, checksum_sha256=excluded.checksum_sha256;`,
+  )
+  .join("\n");
+
+const sql = `${SEED_LICENSES_SQL}\n${familySql}\n${filesSql}\n`;
 
 await mkdir(OUT_DIR, { recursive: true });
 const outPath = join(OUT_DIR, `ingest-${familyDir}.sql`);

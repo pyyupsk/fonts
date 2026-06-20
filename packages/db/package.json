@@ -13,7 +13,7 @@
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",
-    "db:migrate:local": "wrangler d1 migrations apply fonts-db --local",
+    "db:migrate:local": "wrangler d1 migrations apply fonts-db --local --persist-to ../../.wrangler-state",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {

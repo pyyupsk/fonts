@@ -5,6 +5,7 @@ build
 .turbo
 *.log
 *.wrangler
+.wrangler-state
 .out
 .env
 !.env.example
