@@ -29,8 +29,8 @@
   --duration-fast: 120ms;
   --duration-base: 220ms;
 
-  --z-index-dropdown: 10;
-  --z-index-sticky: 20;
+  --z-index-sticky: 10;
+  --z-index-dropdown: 20;
 }
 
 @font-face {
