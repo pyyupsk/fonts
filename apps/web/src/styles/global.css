@@ -28,6 +28,9 @@
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --duration-fast: 120ms;
   --duration-base: 220ms;
+
+  --z-index-dropdown: 10;
+  --z-index-sticky: 20;
 }
 
 @font-face {

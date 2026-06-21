@@ -11,6 +11,9 @@ export default defineConfig({
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ["react-dom/client", "react", "react/jsx-runtime"],
+    },
   },
   server: {
     host: "0.0.0.0",
