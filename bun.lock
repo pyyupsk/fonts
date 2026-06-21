@@ -37,7 +37,6 @@
       "devDependencies": {
         "@astrojs/check": "^0.9.9",
         "@fonts/api": "workspace:*",
-        "@fonts/shared": "workspace:*",
         "@fonts/tsconfig": "workspace:*",
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
@@ -69,14 +68,6 @@
       "devDependencies": {
         "@fonts/tsconfig": "workspace:*",
         "@types/bun": "^1.3.14",
-        "typescript": "^6.0.3",
-      },
-    },
-    "packages/shared": {
-      "name": "@fonts/shared",
-      "version": "0.0.0",
-      "devDependencies": {
-        "@fonts/tsconfig": "workspace:*",
         "typescript": "^6.0.3",
       },
     },
@@ -303,8 +294,6 @@
     "@fonts/db": ["@fonts/db@workspace:packages/db"],
 
     "@fonts/ingest": ["@fonts/ingest@workspace:packages/ingest"],
-
-    "@fonts/shared": ["@fonts/shared@workspace:packages/shared"],
 
     "@fonts/tsconfig": ["@fonts/tsconfig@workspace:packages/tsconfig"],
 
