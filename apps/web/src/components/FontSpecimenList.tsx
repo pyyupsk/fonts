@@ -25,12 +25,18 @@ export function FontSpecimenList({
 
   return (
     <div>
+      <label
+        className="block text-label text-paper-muted mb-2xs"
+        htmlFor="preview-text"
+      >
+        Preview text
+      </label>
       <Input
+        id="preview-text"
         type="text"
         value={text}
         onChange={(event) => setText(event.target.value)}
         placeholder="Type your own preview text…"
-        aria-label="Preview text"
         className="w-full mb-md"
       />
       <div className="border-t border-ink-border">

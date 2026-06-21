@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { BackLink } from "../../components/BackLink.tsx";
+import { EmbedSnippet } from "../../components/EmbedSnippet.tsx";
 import { FontSpecimenList } from "../../components/FontSpecimenList.tsx";
 import { getAllFamilies, getAllFamilyDetails } from "../../lib/build-data";
 
@@ -20,12 +22,7 @@ const apiBase = import.meta.env.API_BASE;
 ---
 
 <BaseLayout title={`${detail.family.name} — Fonts`}>
-  <a
-    href="/"
-    class="text-label text-paper-muted hover:text-accent transition-colors duration-fast ease-out-quart"
-  >
-    ← back
-  </a>
+  <BackLink client:load />
   <h1
     class="font-display text-display font-normal leading-[0.95] tracking-[-0.02em] mt-sm mb-sm"
   >
@@ -47,36 +44,38 @@ const apiBase = import.meta.env.API_BASE;
     variants={detail.variants}
   />
 
-  <section class="mt-2xl">
-    <h2 class="text-heading font-display font-normal mb-md">Download</h2>
+  <section class="mt-2xl mb-2xl">
+    <h2 class="text-heading font-display font-normal mb-md">
+      Download &amp; embed
+    </h2>
     <div class="border-t border-ink-border">
       {
         detail.variants.map((variant) => (
-          <div class="flex items-center justify-between gap-md py-sm border-b border-ink-border">
-            <span class="text-label text-paper">
-              {variant.weight} {variant.style}
-            </span>
-            <a
-              class="text-label text-paper-muted hover:text-accent transition-colors duration-fast ease-out-quart"
-              href={`${apiBase}/api/fonts/${detail.family.id}/${variant.id}.woff2`}
-              download
-            >
-              Download .woff2 ↓
-            </a>
+          <div class="py-md border-b border-ink-border">
+            <div class="flex items-center justify-between gap-md mb-sm">
+              <span class="text-label text-paper">
+                {variant.weight} {variant.style}
+              </span>
+              <a
+                class="text-label text-paper-muted hover:text-accent transition-colors duration-fast ease-out-quart"
+                href={`${apiBase}/api/fonts/${detail.family.id}/${variant.id}.woff2`}
+                download
+              >
+                Download .woff2 ↓
+              </a>
+            </div>
+            <EmbedSnippet
+              client:load
+              apiBase={apiBase}
+              familyId={detail.family.id}
+              familyName={detail.family.name}
+              variantId={variant.id}
+              weight={variant.weight}
+              style={variant.style}
+            />
           </div>
         ))
       }
     </div>
-  </section>
-
-  <section class="mt-2xl mb-2xl">
-    <h2 class="text-heading font-display font-normal mb-md">Embed</h2>
-    <pre
-      class="overflow-x-auto rounded border border-ink-border bg-ink-raised p-md text-label font-sans text-paper-muted"><code>{`@font-face {
-  font-family: "${detail.family.name}";
-  src: url("${apiBase}/api/fonts/${detail.family.id}/${detail.variants[0]?.id}.woff2") format("woff2");
-  font-weight: ${detail.variants[0]?.weight ?? 400};
-  font-style: ${detail.variants[0]?.style ?? "normal"};
-}`}</code></pre>
   </section>
 </BaseLayout>
