@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { FontPreview } from "../../components/FontPreview.tsx";
+import { getAllFamilies, getAllFamilyDetails } from "../../lib/build-data";
+
+export async function getStaticPaths() {
+  const families = await getAllFamilies();
+  const details = await getAllFamilyDetails(families);
+
+  return families
+    .filter((family) => details.has(family.id))
+    .map((family) => ({
+      params: { family: family.id },
+      props: { detail: details.get(family.id)! },
+    }));
+}
+
+const { detail } = Astro.props;
+const apiBase = import.meta.env.API_BASE;
+---
+
+<BaseLayout title={`${detail.family.name} — Fonts`}>
+  <a href="/">← back</a>
+  <h1>{detail.family.name}</h1>
+  <p>
+    {detail.family.designer} · {detail.family.category} · {
+      detail.family.license
+    }
+  </p>
+  <p>Subsets: {detail.subsets.map((subset) => subset.name).join(", ")}</p>
+
+  {
+    detail.variants.map((variant) => (
+      <FontPreview
+        client:load
+        apiBase={apiBase}
+        familyId={detail.family.id}
+        variantId={variant.id}
+        style={variant.style}
+        weight={variant.weight}
+      />
+    ))
+  }
+</BaseLayout>

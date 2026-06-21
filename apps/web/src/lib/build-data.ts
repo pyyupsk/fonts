@@ -37,10 +37,11 @@ export interface FamilyDetail {
   subsets: FamilySubset[];
 }
 
-export async function getAllFamilies(): Promise<FamilySummary[]> {
-  const response = await client.$get();
-  const data = await response.json();
-  return data.families;
+let familiesCache: Promise<FamilySummary[]> | undefined;
+
+export function getAllFamilies(): Promise<FamilySummary[]> {
+  familiesCache ??= client.$get().then(async (response) => (await response.json()).families);
+  return familiesCache;
 }
 
 export async function getFamilyDetail(familyId: string): Promise<FamilyDetail | undefined> {
@@ -49,15 +50,19 @@ export async function getFamilyDetail(familyId: string): Promise<FamilyDetail | 
   return (await response.json()) as FamilyDetail;
 }
 
-export async function getAllFamilyDetails(
-  families: FamilySummary[],
-): Promise<Map<string, FamilyDetail>> {
-  const details = new Map<string, FamilyDetail>();
+let detailsCache: Promise<Map<string, FamilyDetail>> | undefined;
 
-  await runWithConcurrency(families, DETAIL_CONCURRENCY, async (family) => {
-    const detail = await getFamilyDetail(family.id);
-    if (detail) details.set(family.id, detail);
-  });
+export function getAllFamilyDetails(families: FamilySummary[]): Promise<Map<string, FamilyDetail>> {
+  detailsCache ??= (async () => {
+    const details = new Map<string, FamilyDetail>();
 
-  return details;
+    await runWithConcurrency(families, DETAIL_CONCURRENCY, async (family) => {
+      const detail = await getFamilyDetail(family.id);
+      if (detail) details.set(family.id, detail);
+    });
+
+    return details;
+  })();
+
+  return detailsCache;
 }

@@ -1,17 +1,32 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { CatalogFilter } from "../components/CatalogFilter.tsx";
+import type { CatalogEntry } from "../components/CatalogFilter.tsx";
+import { getAllFamilies, getAllFamilyDetails } from "../lib/build-data";
 
+const families = await getAllFamilies();
+const details = await getAllFamilyDetails(families);
+
+const catalog: CatalogEntry[] = families.map((family) => {
+  const detail = details.get(family.id);
+  return {
+    id: family.id,
+    name: family.name,
+    designer: family.designer,
+    category: family.category,
+    license: family.license,
+    weights: detail
+      ? [...new Set(detail.variants.map((variant) => variant.weight))]
+      : [],
+    styles: detail
+      ? [...new Set(detail.variants.map((variant) => variant.style))]
+      : [],
+    subsets: detail ? detail.subsets.map((subset) => subset.name) : [],
+  };
+});
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="Fonts">
+  <h1>Fonts</h1>
+  <CatalogFilter client:load catalog={catalog} />
+</BaseLayout>
