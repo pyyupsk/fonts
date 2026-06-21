@@ -7,7 +7,6 @@ import { parseMetadata } from "./parse-metadata";
 
 const FONTS_DATA_ROOT = join(import.meta.dirname, "../../fonts");
 const WORK_DIR = join(import.meta.dirname, "../.out/woff2");
-const PERSIST_DIR = join(import.meta.dirname, "../../../.wrangler-state");
 const R2_BUCKET = "fonts-bucket";
 
 export interface ConvertedFile {
@@ -47,7 +46,7 @@ export async function convertFamilyFiles(
     const variantId = `${family.id}-${font.weight}-${font.style}`;
     const r2Key = `fonts/${license}/${family.id}/${slugify(family.id)}-${font.weight}-${font.style}.woff2`;
 
-    await $`wrangler r2 object put ${R2_BUCKET}/${r2Key} --file=${woff2Path} --local --persist-to ${PERSIST_DIR}`.quiet();
+    await $`wrangler r2 object put ${R2_BUCKET}/${r2Key} --file=${woff2Path} --remote`.quiet();
 
     converted.push({
       variantId,

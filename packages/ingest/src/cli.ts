@@ -1,9 +1,14 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { convertFamilyFiles } from "./convert-and-upload";
 import { buildIngestSql } from "./ingest-family";
 
 const OUT_DIR = join(import.meta.dirname, "../.out");
+const TOKEN_FILE = join(import.meta.dirname, "../../../.cloudflare-token");
+
+if (!process.env.CLOUDFLARE_API_TOKEN) {
+  process.env.CLOUDFLARE_API_TOKEN = (await readFile(TOKEN_FILE, "utf-8")).trim();
+}
 
 function sqlString(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;
