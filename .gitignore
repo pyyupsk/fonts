@@ -5,6 +5,7 @@ build
 .turbo
 *.log
 *.out
+.astro
 *.wrangler
 *.wrangler-state
 .cloudflare-token
