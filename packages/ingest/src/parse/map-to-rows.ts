@@ -9,6 +9,8 @@ export interface FamilyRow {
   isNoto: boolean;
   dateAdded: string;
   sourceRepositoryUrl: string;
+  wghtMin: number | null;
+  wghtMax: number | null;
 }
 
 export interface VariantRow {
@@ -43,6 +45,8 @@ export function slugify(name: string): string {
 }
 
 export function mapFamily(metadata: ParsedMetadata): FamilyRow {
+  const wghtAxis = metadata.axes.find((axis) => axis.tag === "wght");
+
   return {
     id: slugify(metadata.name),
     name: metadata.name,
@@ -52,6 +56,8 @@ export function mapFamily(metadata: ParsedMetadata): FamilyRow {
     isNoto: metadata.name.startsWith("Noto "),
     dateAdded: metadata.dateAdded,
     sourceRepositoryUrl: metadata.sourceRepositoryUrl,
+    wghtMin: wghtAxis?.minValue ?? null,
+    wghtMax: wghtAxis?.maxValue ?? null,
   };
 }
 

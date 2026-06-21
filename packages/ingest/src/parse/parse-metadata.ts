@@ -5,6 +5,12 @@ export interface ParsedFontEntry {
   postScriptName: string;
 }
 
+export interface ParsedAxis {
+  tag: string;
+  minValue: number;
+  maxValue: number;
+}
+
 export interface ParsedMetadata {
   name: string;
   designer: string;
@@ -12,6 +18,7 @@ export interface ParsedMetadata {
   category: string;
   dateAdded: string;
   fonts: ParsedFontEntry[];
+  axes: ParsedAxis[];
   subsets: string[];
   sourceRepositoryUrl: string;
 }
@@ -35,11 +42,13 @@ export function parseMetadata(text: string): ParsedMetadata {
     category: "",
     dateAdded: "",
     fonts: [],
+    axes: [],
     subsets: [],
     sourceRepositoryUrl: "",
   };
 
   let currentFont: Partial<ParsedFontEntry> | null = null;
+  let currentAxis: Partial<ParsedAxis> | null = null;
   let skipDepth = 0;
   let inSourceBlock = false;
 
@@ -58,7 +67,7 @@ export function parseMetadata(text: string): ParsedMetadata {
         currentFont = null;
         continue;
       }
-      const match = line.match(/^(\w+):\s*(.+)$/);
+      const match = /^(\w+):\s*(.+)$/.exec(line);
       if (!match) continue;
       const key = match[1] ?? "";
       const value = match[2] ?? "";
@@ -66,6 +75,28 @@ export function parseMetadata(text: string): ParsedMetadata {
       if (key === "weight") currentFont.weight = Number(value.trim());
       if (key === "filename") currentFont.filename = unquote(value);
       if (key === "post_script_name") currentFont.postScriptName = unquote(value);
+      continue;
+    }
+
+    if (currentAxis) {
+      if (line === "}") {
+        if (currentAxis.tag && currentAxis.minValue !== undefined && currentAxis.maxValue !== undefined) {
+          result.axes.push({
+            tag: currentAxis.tag,
+            minValue: currentAxis.minValue,
+            maxValue: currentAxis.maxValue,
+          });
+        }
+        currentAxis = null;
+        continue;
+      }
+      const match = /^(\w+):\s*(.+)$/.exec(line);
+      if (!match) continue;
+      const key = match[1] ?? "";
+      const value = match[2] ?? "";
+      if (key === "tag") currentAxis.tag = unquote(value);
+      if (key === "min_value") currentAxis.minValue = Number(value.trim());
+      if (key === "max_value") currentAxis.maxValue = Number(value.trim());
       continue;
     }
 
@@ -80,7 +111,7 @@ export function parseMetadata(text: string): ParsedMetadata {
         continue;
       }
       if (inSourceBlock && skipDepth === 1) {
-        const match = line.match(/^repository_url:\s*(.+)$/);
+        const match = /^repository_url:\s*(.+)$/.exec(line);
         if (match) result.sourceRepositoryUrl = unquote(match[1] ?? "");
       }
       continue;
@@ -91,14 +122,19 @@ export function parseMetadata(text: string): ParsedMetadata {
       continue;
     }
 
-    const blockMatch = line.match(BLOCK_OPEN);
+    if (line === "axes {") {
+      currentAxis = {};
+      continue;
+    }
+
+    const blockMatch = BLOCK_OPEN.exec(line);
     if (blockMatch) {
       skipDepth = 1;
       inSourceBlock = blockMatch[1] === "source";
       continue;
     }
 
-    const topMatch = line.match(/^(\w+):\s*(.+)$/);
+    const topMatch = /^(\w+):\s*(.+)$/.exec(line);
     if (!topMatch) continue;
     const key = topMatch[1] ?? "";
     const value = topMatch[2] ?? "";

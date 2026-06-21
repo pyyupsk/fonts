@@ -14,6 +14,8 @@ export const families = sqliteTable(
     isNoto: integer("is_noto", { mode: "boolean" }).notNull().default(false),
     dateAdded: text("date_added").notNull(),
     sourceRepositoryUrl: text("source_repository_url").notNull(),
+    wghtMin: integer("wght_min"),
+    wghtMax: integer("wght_max"),
   },
   (table) => [
     index("families_category_idx").on(table.category),

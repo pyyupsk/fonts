@@ -16,6 +16,8 @@ export interface FamilySummary {
   isNoto: boolean;
   dateAdded: string;
   sourceRepositoryUrl: string;
+  wghtMin: number | null;
+  wghtMax: number | null;
 }
 
 export interface FamilyVariant {

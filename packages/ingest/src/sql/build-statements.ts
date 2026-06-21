@@ -14,7 +14,7 @@ const db = drizzle({} as unknown as FakeD1Client);
 
 function toInlinedSql(query: { sql: string; params: unknown[] }): string {
   let paramIndex = 0;
-  const inlined = query.sql.replace(/\?/g, () => {
+  const inlined = query.sql.replaceAll('?', () => {
     const param = query.params[paramIndex];
     paramIndex += 1;
     if (param === null || param === undefined) return "NULL";
@@ -52,6 +52,8 @@ export function buildFamilyStatements(family: FamilyRow, variantRows: VariantRow
             isNoto: family.isNoto,
             dateAdded: family.dateAdded,
             sourceRepositoryUrl: family.sourceRepositoryUrl,
+            wghtMin: family.wghtMin,
+            wghtMax: family.wghtMax,
           },
         })
         .toSQL(),
