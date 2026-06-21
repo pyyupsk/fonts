@@ -31,6 +31,7 @@
         "@astrojs/react": "^4.0.0",
         "astro": "^6.4.7",
         "hono": "^4.12.26",
+        "p-limit": "^7.3.0",
         "react": "^19.2.6",
         "react-dom": "^19.2.6",
       },
@@ -64,6 +65,10 @@
       "version": "0.0.0",
       "dependencies": {
         "@aws-sdk/client-s3": "^3.1073.0",
+        "@fonts/db": "workspace:*",
+        "drizzle-orm": "^0.45.2",
+        "p-limit": "^7.3.0",
+        "zod": "^4.4.3",
       },
       "devDependencies": {
         "@fonts/tsconfig": "workspace:*",

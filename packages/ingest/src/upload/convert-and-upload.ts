@@ -1,13 +1,13 @@
 import { createHash } from "node:crypto";
-import { copyFile, mkdir, readFile, stat } from "node:fs/promises";
+import { copyFile, mkdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { PutObjectCommand, type S3Client } from "@aws-sdk/client-s3";
 import { $ } from "bun";
-import { mapFamily, slugify } from "./map-to-rows";
-import { parseMetadata } from "./parse-metadata";
+import { mapFamily, slugify } from "../parse/map-to-rows";
+import { parseMetadata } from "../parse/parse-metadata";
 
-const FONTS_DATA_ROOT = join(import.meta.dirname, "../../fonts");
-const WORK_DIR = join(import.meta.dirname, "../.out/woff2");
+const FONTS_DATA_ROOT = join(import.meta.dirname, "../../../fonts");
+const WORK_DIR = join(import.meta.dirname, "../../.out/woff2");
 const R2_BUCKET = "fonts-bucket";
 
 export interface ConvertedFile {
@@ -15,7 +15,6 @@ export interface ConvertedFile {
   r2Key: string;
   fileSize: number;
   checksumSha256: string;
-  localPath: string;
 }
 
 export async function convertFamilyFiles(
@@ -44,7 +43,6 @@ export async function convertFamilyFiles(
     const woff2Path = ttfCopyPath.replace(/\.ttf$/, ".woff2");
     const fileBuffer = await readFile(woff2Path);
     const checksumSha256 = createHash("sha256").update(fileBuffer).digest("hex");
-    const fileStat = await stat(woff2Path);
     const variantId = `${family.id}-${font.weight}-${font.style}`;
     const r2Key = `fonts/${license}/${family.id}/${slugify(family.id)}-${font.weight}-${font.style}.woff2`;
 
@@ -60,9 +58,8 @@ export async function convertFamilyFiles(
     converted.push({
       variantId,
       r2Key,
-      fileSize: fileStat.size,
+      fileSize: fileBuffer.length,
       checksumSha256,
-      localPath: woff2Path,
     });
   }
 

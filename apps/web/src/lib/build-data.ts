@@ -1,6 +1,6 @@
 import { hc } from "hono/client";
+import pLimit from "p-limit";
 import type { AppType } from "@fonts/api";
-import { runWithConcurrency } from "./run-with-concurrency";
 
 const API_BASE = import.meta.env.API_BASE;
 const client = hc<AppType>(API_BASE).api.fonts;
@@ -55,11 +55,16 @@ let detailsCache: Promise<Map<string, FamilyDetail>> | undefined;
 export function getAllFamilyDetails(families: FamilySummary[]): Promise<Map<string, FamilyDetail>> {
   detailsCache ??= (async () => {
     const details = new Map<string, FamilyDetail>();
+    const limitConcurrency = pLimit(DETAIL_CONCURRENCY);
 
-    await runWithConcurrency(families, DETAIL_CONCURRENCY, async (family) => {
-      const detail = await getFamilyDetail(family.id);
-      if (detail) details.set(family.id, detail);
-    });
+    await Promise.all(
+      families.map((family) =>
+        limitConcurrency(async () => {
+          const detail = await getFamilyDetail(family.id);
+          if (detail) details.set(family.id, detail);
+        }),
+      ),
+    );
 
     return details;
   })();

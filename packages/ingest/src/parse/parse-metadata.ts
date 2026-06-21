@@ -20,6 +20,12 @@ function unquote(value: string): string {
   return value.trim().replace(/^"(.*)"$/, "$1");
 }
 
+const BLOCK_OPEN = /^(\w+)\s*\{$/;
+
+// Hand-rolled textproto parser (no JS lib supports textproto), validated against
+// proto/fonts_public.proto. Block-skipping is generic by depth, not by name —
+// fixes a real bug where unhandled blocks (fallbacks, sample_text, etc.) leaked
+// scalar fields into the top-level result.
 export function parseMetadata(text: string): ParsedMetadata {
   const lines = text.split("\n");
   const result: ParsedMetadata = {
@@ -34,31 +40,15 @@ export function parseMetadata(text: string): ParsedMetadata {
   };
 
   let currentFont: Partial<ParsedFontEntry> | null = null;
+  let skipDepth = 0;
   let inSourceBlock = false;
-  let braceDepth = 0;
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
     if (line === "" || line.startsWith("#")) continue;
 
-    if (line.startsWith("fonts {")) {
-      currentFont = {};
-      continue;
-    }
-
-    if (line.startsWith("source {")) {
-      inSourceBlock = true;
-      braceDepth = 1;
-      continue;
-    }
-
-    if (line.startsWith("axes {")) {
-      braceDepth += 1;
-      continue;
-    }
-
-    if (line === "}") {
-      if (currentFont) {
+    if (currentFont) {
+      if (line === "}") {
         result.fonts.push({
           style: currentFont.style ?? "normal",
           weight: currentFont.weight ?? 400,
@@ -68,30 +58,43 @@ export function parseMetadata(text: string): ParsedMetadata {
         currentFont = null;
         continue;
       }
-      if (braceDepth > 0) {
-        braceDepth -= 1;
-        if (braceDepth === 0) inSourceBlock = false;
+      const match = line.match(/^(\w+):\s*(.+)$/);
+      if (!match) continue;
+      const key = match[1] ?? "";
+      const value = match[2] ?? "";
+      if (key === "style") currentFont.style = unquote(value);
+      if (key === "weight") currentFont.weight = Number(value.trim());
+      if (key === "filename") currentFont.filename = unquote(value);
+      if (key === "post_script_name") currentFont.postScriptName = unquote(value);
+      continue;
+    }
+
+    if (skipDepth > 0) {
+      if (line === "}") {
+        skipDepth -= 1;
+        if (skipDepth === 0) inSourceBlock = false;
         continue;
+      }
+      if (BLOCK_OPEN.test(line)) {
+        skipDepth += 1;
+        continue;
+      }
+      if (inSourceBlock && skipDepth === 1) {
+        const match = line.match(/^repository_url:\s*(.+)$/);
+        if (match) result.sourceRepositoryUrl = unquote(match[1] ?? "");
       }
       continue;
     }
 
-    if (currentFont || braceDepth > 0) {
-      if (currentFont) {
-        const match = line.match(/^(\w+):\s*(.+)$/);
-        if (!match) continue;
-        const key = match[1] ?? "";
-        const value = match[2] ?? "";
-        if (key === "style") currentFont.style = unquote(value);
-        if (key === "weight") currentFont.weight = Number(value.trim());
-        if (key === "filename") currentFont.filename = unquote(value);
-        if (key === "post_script_name") currentFont.postScriptName = unquote(value);
-        continue;
-      }
-      if (inSourceBlock && braceDepth === 1) {
-        const match = line.match(/^repository_url:\s*(.+)$/);
-        if (match) result.sourceRepositoryUrl = unquote(match[1] ?? "");
-      }
+    if (line === "fonts {") {
+      currentFont = {};
+      continue;
+    }
+
+    const blockMatch = line.match(BLOCK_OPEN);
+    if (blockMatch) {
+      skipDepth = 1;
+      inSourceBlock = blockMatch[1] === "source";
       continue;
     }
 
