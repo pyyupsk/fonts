@@ -1,0 +1,21 @@
+{
+  "name": "@fonts/api",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --persist-to ../../.wrangler-state",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.0",
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250000.0",
+    "@fonts/db": "workspace:*",
+    "@fonts/tsconfig": "workspace:*",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.0.0"
+  }
+}
