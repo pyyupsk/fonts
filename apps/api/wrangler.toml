@@ -5,7 +5,7 @@ compatibility_date = "2025-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "fonts-db"
-database_id = "local-dev"
+database_id = "abeacae9-07fb-4b79-a428-699ac9f31c2f"
 
 [[r2_buckets]]
 binding = "FONTS_BUCKET"
