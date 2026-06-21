@@ -8,14 +8,14 @@
     "deploy": "wrangler deploy"
   },
   "dependencies": {
-    "drizzle-orm": "^0.44.0",
-    "hono": "^4.6.0"
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.12.26"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250000.0",
+    "@cloudflare/workers-types": "^4.20260621.1",
     "@fonts/db": "workspace:*",
     "@fonts/tsconfig": "workspace:*",
-    "typescript": "^5.9.0",
-    "wrangler": "^4.0.0"
+    "typescript": "^6.0.3",
+    "wrangler": "^4.103.0"
   }
 }

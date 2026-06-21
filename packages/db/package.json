@@ -17,14 +17,14 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "drizzle-orm": "^0.44.0"
+    "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
     "@fonts/tsconfig": "workspace:*",
-    "@types/node": "^22.0.0",
-    "better-sqlite3": "^11.0.0",
-    "drizzle-kit": "^0.31.0",
-    "typescript": "^5.9.0",
-    "wrangler": "^4.0.0"
+    "@types/node": "^26.0.0",
+    "better-sqlite3": "^12.11.1",
+    "drizzle-kit": "^0.31.10",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.103.0"
   }
 }
