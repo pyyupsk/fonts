@@ -20,25 +20,31 @@ const apiBase = import.meta.env.API_BASE;
 ---
 
 <BaseLayout title={`${detail.family.name} — Fonts`}>
-  <a href="/">← back</a>
-  <h1>{detail.family.name}</h1>
-  <p>
-    {detail.family.designer} · {detail.family.category} · {
-      detail.family.license
-    }
+  <a href="/" class="text-label text-paper-muted hover:text-accent transition-colors duration-fast ease-out-quart">
+    ← back
+  </a>
+  <h1 class="font-display text-display font-normal leading-[0.95] tracking-[-0.02em] mt-sm mb-sm">
+    {detail.family.name}
+  </h1>
+  <p class="text-paper-muted mb-xs">
+    {detail.family.designer} · {detail.family.category} · {detail.family.license}
   </p>
-  <p>Subsets: {detail.subsets.map((subset) => subset.name).join(", ")}</p>
+  <p class="text-label text-paper-muted mb-lg">
+    Subsets: {detail.subsets.map((subset) => subset.name).join(", ")}
+  </p>
 
-  {
-    detail.variants.map((variant) => (
-      <FontPreview
-        client:load
-        apiBase={apiBase}
-        familyId={detail.family.id}
-        variantId={variant.id}
-        style={variant.style}
-        weight={variant.weight}
-      />
-    ))
-  }
+  <div class="border-t border-ink-border">
+    {
+      detail.variants.map((variant) => (
+        <FontPreview
+          client:load
+          apiBase={apiBase}
+          familyId={detail.family.id}
+          variantId={variant.id}
+          style={variant.style}
+          weight={variant.weight}
+        />
+      ))
+    }
+  </div>
 </BaseLayout>

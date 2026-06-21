@@ -48,6 +48,7 @@ export function FontPreview({
 
   return (
     <p
+      className="py-md border-b border-ink-border"
       style={{
         fontFamily: loaded ? fontFamilyName : "sans-serif",
         fontStyle: style === "italic" ? "italic" : "normal",

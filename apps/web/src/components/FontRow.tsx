@@ -49,14 +49,18 @@ export function FontRow({
   }, [apiBase, familyId, defaultVariantId, fontFamilyName]);
 
   return (
-    <a className="font-row" href={`/fonts/${familyId}/`} ref={rowRef}>
+    <a
+      className="flex flex-wrap items-baseline justify-between gap-sm gap-x-lg py-md border-b border-ink-border text-paper no-underline transition-colors duration-fast ease-out-quart hover:text-accent focus-visible:text-accent"
+      href={`/fonts/${familyId}/`}
+      ref={rowRef}
+    >
       <span
-        className="font-row__name"
+        className="text-row font-normal leading-[1.1]"
         style={{ fontFamily: loaded ? fontFamilyName : "var(--font-display)" }}
       >
         {name}
       </span>
-      <span className="font-row__meta">
+      <span className="text-label text-paper-muted whitespace-nowrap">
         {designer} · {category} · {license}
       </span>
     </a>

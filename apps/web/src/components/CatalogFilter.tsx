@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FontRow } from "./FontRow";
+import { Input } from "./ui/Input";
+import { Select } from "./ui/Select";
 
 const BATCH_SIZE = 60;
 
@@ -70,64 +72,43 @@ export function CatalogFilter({ apiBase, catalog }: Readonly<CatalogFilterProps>
   }, [hasMore]);
 
   return (
-    <div className="catalog">
-      <div className="catalog__controls">
-        <input
-          className="catalog__search"
+    <div>
+      <div className="flex flex-wrap items-center gap-sm mb-md">
+        <Input
+          className="flex-1 basis-64"
           type="search"
           placeholder="Search fonts…"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           aria-label="Search fonts"
         />
-        <div className="catalog__filters">
-          <select
-            className="catalog__select"
+        <div className="flex flex-wrap gap-xs">
+          <Select
+            ariaLabel="Category"
             value={category}
-            onChange={(event) => setCategory(event.target.value)}
-            aria-label="Category"
-          >
-            <option value={ALL}>All categories</option>
-            {categories.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
-          <select
-            className="catalog__select"
+            onChange={setCategory}
+            options={[{ value: ALL, label: "All categories" }, ...toOptions(categories)]}
+          />
+          <Select
+            ariaLabel="License"
             value={license}
-            onChange={(event) => setLicense(event.target.value)}
-            aria-label="License"
-          >
-            <option value={ALL}>All licenses</option>
-            {licenses.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
-          <select
-            className="catalog__select"
+            onChange={setLicense}
+            options={[{ value: ALL, label: "All licenses" }, ...toOptions(licenses)]}
+          />
+          <Select
+            ariaLabel="Style"
             value={style}
-            onChange={(event) => setStyle(event.target.value)}
-            aria-label="Style"
-          >
-            <option value={ALL}>All styles</option>
-            {styles.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
+            onChange={setStyle}
+            options={[{ value: ALL, label: "All styles" }, ...toOptions(styles)]}
+          />
         </div>
       </div>
 
-      <p className="catalog__count">
+      <p className="text-label text-paper-muted mb-md">
         {filtered.length.toLocaleString()} of {catalog.length.toLocaleString()} fonts
       </p>
 
-      <div className="catalog__list" role="list">
+      <div className="border-t border-ink-border" role="list">
         {visible.map((entry) => (
           <FontRow
             key={entry.id}
@@ -141,11 +122,15 @@ export function CatalogFilter({ apiBase, catalog }: Readonly<CatalogFilterProps>
           />
         ))}
       </div>
-      {hasMore && <div ref={sentinelRef} className="catalog__sentinel" aria-hidden="true" />}
+      {hasMore && <div ref={sentinelRef} className="h-px" aria-hidden="true" />}
     </div>
   );
 }
 
 function uniqueSorted<T>(values: T[]): T[] {
   return [...new Set(values)].sort();
+}
+
+function toOptions(values: string[]): { value: string; label: string }[] {
+  return values.map((value) => ({ value, label: value }));
 }
