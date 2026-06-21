@@ -13,7 +13,9 @@
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",
+    "db:migrate": "CLOUDFLARE_API_TOKEN=$(cat ../../.cloudflare-token) wrangler d1 migrations apply fonts-db --remote",
     "db:migrate:local": "wrangler d1 migrations apply fonts-db --local --persist-to ../../.wrangler-state",
+    "db:execute": "CLOUDFLARE_API_TOKEN=$(cat ../../.cloudflare-token) wrangler d1 execute fonts-db --remote",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {

@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev --persist-to ../../.wrangler-state",
-    "deploy": "wrangler deploy"
+    "dev": "CLOUDFLARE_API_TOKEN=$(cat ../../.cloudflare-token) wrangler dev --remote",
+    "dev:local": "wrangler dev --persist-to ../../.wrangler-state",
+    "deploy": "CLOUDFLARE_API_TOKEN=$(cat ../../.cloudflare-token) wrangler deploy"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
