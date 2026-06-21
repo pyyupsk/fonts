@@ -6,6 +6,7 @@ interface FontPreviewProps {
   variantId: string;
   style: string;
   weight: number;
+  text: string;
 }
 
 function fontFileUrl(
@@ -22,6 +23,7 @@ export function FontPreview({
   variantId,
   style,
   weight,
+  text,
 }: Readonly<FontPreviewProps>) {
   const fontFamilyName = `preview-${familyId}-${variantId}`;
   const [loaded, setLoaded] = useState(false);
@@ -47,25 +49,20 @@ export function FontPreview({
   }, [apiBase, familyId, variantId, style, weight, fontFamilyName]);
 
   return (
-    <p
-      className="py-md border-b border-ink-border"
-      style={{
-        fontFamily: loaded ? fontFamilyName : "sans-serif",
-        fontStyle: style === "italic" ? "italic" : "normal",
-        fontWeight: weight,
-        fontSize: "1.5rem",
-      }}
-    >
-      Everyone has the right to freedom of thought, conscience and religion;
-      this right includes freedom to change his religion or belief, and freedom,
-      either alone or in community with others and in public or private, to
-      manifest his religion or belief in teaching, practice, worship and
-      observance. Everyone has the right to freedom of opinion and expression;
-      this right includes freedom to hold opinions without interference and to
-      seek, receive and impart information and ideas through any media and
-      regardless of frontiers. Everyone has the right to rest and leisure,
-      including reasonable limitation of working hours and periodic holidays
-      with pay.
-    </p>
+    <div className="py-lg border-b border-ink-border">
+      <p className="text-label text-paper-muted mb-xs">
+        {weight} {style}
+      </p>
+      <p
+        className="text-[clamp(1.5rem,3vw,2.5rem)] leading-tight"
+        style={{
+          fontFamily: loaded ? fontFamilyName : "var(--font-sans)",
+          fontStyle: style === "italic" ? "italic" : "normal",
+          fontWeight: weight,
+        }}
+      >
+        {text}
+      </p>
+    </div>
   );
 }
