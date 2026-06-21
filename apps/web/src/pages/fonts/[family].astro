@@ -3,7 +3,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { BackLink } from "../../components/BackLink.tsx";
 import { EmbedSnippet } from "../../components/EmbedSnippet.tsx";
 import { FontSpecimenList } from "../../components/FontSpecimenList.tsx";
+import { buildEmbedSnippet } from "../../lib/build-embed-snippet";
 import { getAllFamilies, getAllFamilyDetails } from "../../lib/build-data";
+import { highlightCss } from "../../lib/highlight-css";
 
 export async function getStaticPaths() {
   const families = await getAllFamilies();
@@ -19,6 +21,24 @@ export async function getStaticPaths() {
 
 const { detail } = Astro.props;
 const apiBase = import.meta.env.API_BASE;
+
+const embedSnippets = await Promise.all(
+  detail.variants.map(async (variant) => {
+    const code = buildEmbedSnippet({
+      apiBase,
+      familyId: detail.family.id,
+      familyName: detail.family.name,
+      variantId: variant.id,
+      weight: variant.weight,
+      style: variant.style,
+    });
+    return {
+      variantId: variant.id,
+      code,
+      highlightedHtml: await highlightCss(code),
+    };
+  }),
+);
 ---
 
 <BaseLayout title={`${detail.family.name} — Fonts`}>
@@ -50,31 +70,32 @@ const apiBase = import.meta.env.API_BASE;
     </h2>
     <div class="border-t border-ink-border">
       {
-        detail.variants.map((variant) => (
-          <div class="py-md border-b border-ink-border">
-            <div class="flex items-center justify-between gap-md mb-sm">
-              <span class="text-label text-paper">
-                {variant.weight} {variant.style}
-              </span>
-              <a
-                class="text-label text-paper-muted hover:text-accent transition-colors duration-fast ease-out-quart"
-                href={`${apiBase}/api/fonts/${detail.family.id}/${variant.id}.woff2`}
-                download
-              >
-                Download .woff2 ↓
-              </a>
+        detail.variants.map((variant) => {
+          const snippet = embedSnippets.find(
+            (entry) => entry.variantId === variant.id,
+          )!;
+          return (
+            <div class="py-md border-b border-ink-border">
+              <div class="flex items-center justify-between gap-md mb-sm">
+                <span class="text-label text-paper">
+                  {variant.weight} {variant.style}
+                </span>
+                <a
+                  class="text-label text-paper-muted hover:text-accent transition-colors duration-fast ease-out-quart"
+                  href={`${apiBase}/api/fonts/${detail.family.id}/${variant.id}.woff2`}
+                  download
+                >
+                  Download .woff2 ↓
+                </a>
+              </div>
+              <EmbedSnippet
+                client:load
+                code={snippet.code}
+                highlightedHtml={snippet.highlightedHtml}
+              />
             </div>
-            <EmbedSnippet
-              client:load
-              apiBase={apiBase}
-              familyId={detail.family.id}
-              familyName={detail.family.name}
-              variantId={variant.id}
-              weight={variant.weight}
-              style={variant.style}
-            />
-          </div>
-        ))
+          );
+        })
       }
     </div>
   </section>

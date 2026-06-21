@@ -1,45 +1,25 @@
 import { useState } from "react";
 
 interface EmbedSnippetProps {
-  apiBase: string;
-  familyId: string;
-  familyName: string;
-  variantId: string;
-  weight: number;
-  style: string;
+  code: string;
+  highlightedHtml: string;
 }
 
-function buildSnippet({
-  apiBase,
-  familyId,
-  familyName,
-  variantId,
-  weight,
-  style,
-}: EmbedSnippetProps): string {
-  return `@font-face {
-  font-family: "${familyName}";
-  src: url("${apiBase}/api/fonts/${familyId}/${variantId}.woff2") format("woff2");
-  font-weight: ${weight};
-  font-style: ${style};
-}`;
-}
-
-export function EmbedSnippet(props: Readonly<EmbedSnippetProps>) {
+export function EmbedSnippet({
+  code,
+  highlightedHtml,
+}: Readonly<EmbedSnippetProps>) {
   const [copied, setCopied] = useState(false);
-  const snippet = buildSnippet(props);
 
   async function handleCopy() {
-    await globalThis.window.navigator.clipboard.writeText(snippet);
+    await globalThis.window.navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
 
   return (
-    <div className="relative">
-      <pre className="overflow-x-auto rounded border border-ink-border bg-ink-raised p-md pr-20 text-label font-sans text-paper-muted">
-        <code>{snippet}</code>
-      </pre>
+    <div className="relative [&_.shiki]:overflow-x-auto [&_.shiki]:rounded [&_.shiki]:border [&_.shiki]:border-ink-border [&_.shiki]:p-md [&_.shiki]:pr-20 [&_.shiki]:bg-ink-raised! [&_.shiki]:text-label [&_.shiki]:font-sans">
+      <div dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
       <button
         type="button"
         onClick={handleCopy}
