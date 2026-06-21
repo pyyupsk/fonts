@@ -2,12 +2,9 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { mapFamily, mapSubsets, mapVariants } from "./map-to-rows";
 import { parseMetadata } from "./parse-metadata";
+import { sqlString } from "./sql-builder";
 
 const FONTS_DATA_ROOT = join(import.meta.dirname, "../../fonts");
-
-function sqlString(value: string): string {
-  return `'${value.replaceAll("'", "''")}'`;
-}
 
 export async function buildIngestSql(license: "ofl" | "apache" | "ufl", familyDir: string): Promise<string> {
   const metadataPath = join(FONTS_DATA_ROOT, license, familyDir, "METADATA.pb");
@@ -28,10 +25,9 @@ export async function buildIngestSql(license: "ofl" | "apache" | "ufl", familyDi
 
   for (const subset of subsets) {
     statements.push(
-      `INSERT INTO subsets (id, name) VALUES (${sqlString(subset.id)}, ${sqlString(subset.name)}) ON CONFLICT (id) DO NOTHING;`,
-    );
-    statements.push(
+      `INSERT INTO subsets (id, name) VALUES (${sqlString(subset.id)}, ${sqlString(subset.name)}) ON CONFLICT (id) DO NOTHING;`, 
       `INSERT INTO family_subsets (family_id, subset_id) VALUES (${sqlString(family.id)}, ${sqlString(subset.id)}) ON CONFLICT DO NOTHING;`,
+    
     );
   }
 

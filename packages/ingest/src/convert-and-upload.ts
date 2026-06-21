@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { copyFile, mkdir, readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
+import { PutObjectCommand, type S3Client } from "@aws-sdk/client-s3";
 import { $ } from "bun";
 import { mapFamily, slugify } from "./map-to-rows";
 import { parseMetadata } from "./parse-metadata";
@@ -20,6 +21,7 @@ export interface ConvertedFile {
 export async function convertFamilyFiles(
   license: "ofl" | "apache" | "ufl",
   familyDir: string,
+  s3Client: S3Client,
 ): Promise<ConvertedFile[]> {
   const familyPath = join(FONTS_DATA_ROOT, license, familyDir);
   const metadataPath = join(familyPath, "METADATA.pb");
@@ -46,7 +48,14 @@ export async function convertFamilyFiles(
     const variantId = `${family.id}-${font.weight}-${font.style}`;
     const r2Key = `fonts/${license}/${family.id}/${slugify(family.id)}-${font.weight}-${font.style}.woff2`;
 
-    await $`wrangler r2 object put ${R2_BUCKET}/${r2Key} --file=${woff2Path} --remote`.quiet();
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: R2_BUCKET,
+        Key: r2Key,
+        Body: fileBuffer,
+        ContentType: "font/woff2",
+      }),
+    );
 
     converted.push({
       variantId,
