@@ -8,20 +8,34 @@ interface FontPreviewProps {
   weight: number;
 }
 
-function fontFileUrl(apiBase: string, familyId: string, variantId: string): string {
+function fontFileUrl(
+  apiBase: string,
+  familyId: string,
+  variantId: string,
+): string {
   return `${apiBase}/api/fonts/${familyId}/${variantId}.woff2`;
 }
 
-export function FontPreview({ apiBase, familyId, variantId, style, weight }: Readonly<FontPreviewProps>) {
+export function FontPreview({
+  apiBase,
+  familyId,
+  variantId,
+  style,
+  weight,
+}: Readonly<FontPreviewProps>) {
   const fontFamilyName = `preview-${familyId}-${variantId}`;
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     let isCurrent = true;
-    const fontFace = new FontFace(fontFamilyName, `url(${fontFileUrl(apiBase, familyId, variantId)})`, {
-      style,
-      weight: weight.toString(),
-    });
+    const fontFace = new FontFace(
+      fontFamilyName,
+      `url(${fontFileUrl(apiBase, familyId, variantId)})`,
+      {
+        style,
+        weight: weight.toString(),
+      },
+    );
     fontFace.load().then((loadedFace) => {
       if (!isCurrent) return;
       document.fonts.add(loadedFace);
@@ -41,7 +55,16 @@ export function FontPreview({ apiBase, familyId, variantId, style, weight }: Rea
         fontSize: "1.5rem",
       }}
     >
-      The quick brown fox jumps over the lazy dog — {weight} {style}
+      Everyone has the right to freedom of thought, conscience and religion;
+      this right includes freedom to change his religion or belief, and freedom,
+      either alone or in community with others and in public or private, to
+      manifest his religion or belief in teaching, practice, worship and
+      observance. Everyone has the right to freedom of opinion and expression;
+      this right includes freedom to hold opinions without interference and to
+      seek, receive and impart information and ideas through any media and
+      regardless of frontiers. Everyone has the right to rest and leisure,
+      including reasonable limitation of working hours and periodic holidays
+      with pay.
     </p>
   );
 }

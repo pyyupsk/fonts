@@ -11,7 +11,7 @@
     "preview": "wrangler dev"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.0.0",
+    "@astrojs/cloudflare": "~12.6.13",
     "@astrojs/react": "^4.0.0",
     "astro": "^6.4.7",
     "hono": "^4.12.26",

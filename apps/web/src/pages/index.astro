@@ -4,29 +4,36 @@ import { CatalogFilter } from "../components/CatalogFilter.tsx";
 import type { CatalogEntry } from "../components/CatalogFilter.tsx";
 import { getAllFamilies, getAllFamilyDetails } from "../lib/build-data";
 
+const apiBase = import.meta.env.API_BASE;
 const families = await getAllFamilies();
 const details = await getAllFamilyDetails(families);
 
 const catalog: CatalogEntry[] = families.map((family) => {
   const detail = details.get(family.id);
+  const variants = detail?.variants ?? [];
+  const defaultVariant =
+    variants.find((variant) => variant.weight === 400 && variant.style === "normal") ?? variants[0];
+
   return {
     id: family.id,
     name: family.name,
     designer: family.designer,
     category: family.category,
     license: family.license,
-    weights: detail
-      ? [...new Set(detail.variants.map((variant) => variant.weight))]
-      : [],
-    styles: detail
-      ? [...new Set(detail.variants.map((variant) => variant.style))]
-      : [],
-    subsets: detail ? detail.subsets.map((subset) => subset.name) : [],
+    defaultVariantId: defaultVariant?.id ?? "",
+    weights: [...new Set(variants.map((variant) => variant.weight))],
+    styles: [...new Set(variants.map((variant) => variant.style))],
+    subsets: detail?.subsets.map((subset) => subset.name) ?? [],
   };
 });
 ---
 
-<BaseLayout title="Fonts">
-  <h1>Fonts</h1>
-  <CatalogFilter client:load catalog={catalog} />
+<BaseLayout title="Fonts — a self-hosted type catalog">
+  <header class="page-header">
+    <h1 class="page-header__title">Fonts</h1>
+    <p class="page-header__tagline">
+      A self-hosted, open-license type catalog. Browse, compare, and grab the file.
+    </p>
+  </header>
+  <CatalogFilter client:load apiBase={apiBase} catalog={catalog} />
 </BaseLayout>
