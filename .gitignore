@@ -4,9 +4,12 @@ build
 .next
 .turbo
 *.log
+*.out
 *.wrangler
-.wrangler-state
-.out
+*.wrangler-state
+.cloudflare-token
+.r2-access-key-id
+.r2-secret-access-key
+.r2-endpoint
 .env
 !.env.example
-.cloudflare-token
