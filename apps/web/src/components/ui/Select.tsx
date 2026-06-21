@@ -10,11 +10,16 @@ interface SelectProps {
   ariaLabel: string;
 }
 
-export function Select({ value, onChange, options, ariaLabel }: Readonly<SelectProps>) {
+export function Select({
+  value,
+  onChange,
+  options,
+  ariaLabel,
+}: Readonly<SelectProps>) {
   return (
     <div className="relative inline-flex">
       <select
-        className="appearance-none bg-ink-raised border border-ink-border rounded text-paper font-body text-label pl-sm pr-[calc(var(--spacing-md)+var(--spacing-xs))] py-xs transition-colors duration-fast ease-out-quart focus-visible:border-accent"
+        className="appearance-none bg-ink-raised border border-ink-border rounded text-paper text-label pl-sm pr-[calc(var(--spacing-md)+var(--spacing-xs))] py-xs transition-colors duration-fast ease-out-quart focus-visible:border-accent"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         aria-label={ariaLabel}
@@ -31,7 +36,14 @@ export function Select({ value, onChange, options, ariaLabel }: Readonly<SelectP
         aria-hidden="true"
         focusable="false"
       >
-        <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M4 6l4 4 4-4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
     </div>
   );
