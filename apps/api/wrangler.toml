@@ -7,6 +7,5 @@ binding = "DB"
 database_name = "fonts-db"
 database_id = "abeacae9-07fb-4b79-a428-699ac9f31c2f"
 
-[[r2_buckets]]
-binding = "FONTS_BUCKET"
-bucket_name = "fonts-bucket"
+[vars]
+FONTS_PUBLIC_BASE = "https://fonts.fasu.dev"

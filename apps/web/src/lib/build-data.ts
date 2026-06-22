@@ -26,6 +26,7 @@ export interface FamilyVariant {
   style: string;
   weight: number;
   postScriptName: string;
+  fileUrl: string;
 }
 
 export interface FamilySubset {
@@ -49,7 +50,7 @@ export function getAllFamilies(): Promise<FamilySummary[]> {
 export async function getFamilyDetail(familyId: string): Promise<FamilyDetail | undefined> {
   const response = await client[":family"].$get({ param: { family: familyId } });
   if (response.status === 404) return undefined;
-  return (await response.json()) as FamilyDetail;
+  return await response.json();
 }
 
 let detailsCache: Promise<Map<string, FamilyDetail>> | undefined;

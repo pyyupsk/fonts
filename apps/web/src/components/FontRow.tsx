@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
 interface FontRowProps {
-  apiBase: string;
   familyId: string;
-  defaultVariantId: string;
+  defaultFileUrl: string;
   name: string;
   designer: string;
   category: string;
@@ -11,9 +10,8 @@ interface FontRowProps {
 }
 
 export function FontRow({
-  apiBase,
   familyId,
-  defaultVariantId,
+  defaultFileUrl,
   name,
   designer,
   category,
@@ -32,10 +30,7 @@ export function FontRow({
         if (!entry?.isIntersecting) return;
         observer.disconnect();
 
-        const fontFace = new FontFace(
-          fontFamilyName,
-          `url(${apiBase}/api/fonts/${familyId}/${defaultVariantId}.woff2)`,
-        );
+        const fontFace = new FontFace(fontFamilyName, `url(${defaultFileUrl})`);
         fontFace.load().then((loadedFace) => {
           document.fonts.add(loadedFace);
           setLoaded(true);
@@ -46,7 +41,7 @@ export function FontRow({
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [apiBase, familyId, defaultVariantId, fontFamilyName]);
+  }, [defaultFileUrl, fontFamilyName]);
 
   return (
     <a

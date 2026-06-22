@@ -4,7 +4,6 @@ import { CatalogFilter } from "../components/CatalogFilter.tsx";
 import type { CatalogEntry } from "../components/CatalogFilter.tsx";
 import { getAllFamilies, getAllFamilyDetails } from "../lib/build-data";
 
-const apiBase = import.meta.env.API_BASE;
 const families = await getAllFamilies();
 const details = await getAllFamilyDetails(families);
 
@@ -12,7 +11,9 @@ const catalog: CatalogEntry[] = families.map((family) => {
   const detail = details.get(family.id);
   const variants = detail?.variants ?? [];
   const defaultVariant =
-    variants.find((variant) => variant.weight === 400 && variant.style === "normal") ?? variants[0];
+    variants.find(
+      (variant) => variant.weight === 400 && variant.style === "normal",
+    ) ?? variants[0];
 
   return {
     id: family.id,
@@ -20,7 +21,7 @@ const catalog: CatalogEntry[] = families.map((family) => {
     designer: family.designer,
     category: family.category,
     license: family.license,
-    defaultVariantId: defaultVariant?.id ?? "",
+    defaultFileUrl: defaultVariant?.fileUrl ?? "",
     weights: [...new Set(variants.map((variant) => variant.weight))],
     styles: [...new Set(variants.map((variant) => variant.style))],
     subsets: detail?.subsets.map((subset) => subset.name) ?? [],
@@ -30,12 +31,17 @@ const catalog: CatalogEntry[] = families.map((family) => {
 
 <BaseLayout title="Fonts — a self-hosted type catalog">
   <header class="border-b border-ink-border pt-xl pb-lg mb-lg">
-    <h1 class="font-display text-display font-normal leading-[0.95] tracking-[-0.02em] text-balance mb-sm">
+    <h1
+      class="font-display text-display font-normal leading-[0.95] tracking-[-0.02em] text-balance mb-sm"
+    >
       Fonts
     </h1>
-    <p class="max-w-[42ch] text-pretty text-paper-muted text-[clamp(1rem,1.6vw,1.25rem)]">
-      A self-hosted, open-license type catalog. Browse, compare, and grab the file.
+    <p
+      class="max-w-[42ch] text-pretty text-paper-muted text-[clamp(1rem,1.6vw,1.25rem)]"
+    >
+      A self-hosted, open-license type catalog. Browse, compare, and grab the
+      file.
     </p>
   </header>
-  <CatalogFilter client:load apiBase={apiBase} catalog={catalog} />
+  <CatalogFilter client:load catalog={catalog} />
 </BaseLayout>

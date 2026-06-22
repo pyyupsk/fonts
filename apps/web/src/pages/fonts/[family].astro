@@ -20,15 +20,12 @@ export async function getStaticPaths() {
 }
 
 const { detail } = Astro.props;
-const apiBase = import.meta.env.API_BASE;
 
 const embedSnippets = await Promise.all(
   detail.variants.map(async (variant) => {
     const code = buildEmbedSnippet({
-      apiBase,
-      familyId: detail.family.id,
       familyName: detail.family.name,
-      variantId: variant.id,
+      fileUrl: variant.fileUrl,
       weight: variant.weight,
       style: variant.style,
       wghtMin: detail.family.wghtMin,
@@ -61,7 +58,6 @@ const embedSnippets = await Promise.all(
 
   <FontSpecimenList
     client:load
-    apiBase={apiBase}
     familyId={detail.family.id}
     variants={detail.variants}
     wghtMin={detail.family.wghtMin}
@@ -91,7 +87,7 @@ const embedSnippets = await Promise.all(
                 </span>
                 <a
                   class="text-label text-paper-muted hover:text-accent transition-colors duration-fast ease-out-quart"
-                  href={`${apiBase}/api/fonts/${detail.family.id}/${variant.id}.woff2`}
+                  href={variant.fileUrl}
                   download
                 >
                   Download .woff2 ↓

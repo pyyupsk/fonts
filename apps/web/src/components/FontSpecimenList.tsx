@@ -9,10 +9,10 @@ interface Variant {
   id: string;
   style: string;
   weight: number;
+  fileUrl: string;
 }
 
 interface FontSpecimenListProps {
-  apiBase: string;
   familyId: string;
   variants: Variant[];
   wghtMin: number | null;
@@ -20,7 +20,6 @@ interface FontSpecimenListProps {
 }
 
 export function FontSpecimenList({
-  apiBase,
   familyId,
   variants,
   wghtMin,
@@ -48,7 +47,6 @@ export function FontSpecimenList({
       {isVariable ? (
         <div className="border-t border-ink-border">
           <VariableFontSpecimen
-            apiBase={apiBase}
             familyId={familyId}
             variants={variants}
             wghtMin={wghtMin}
@@ -61,9 +59,9 @@ export function FontSpecimenList({
           {variants.map((variant) => (
             <FontPreview
               key={variant.id}
-              apiBase={apiBase}
               familyId={familyId}
               variantId={variant.id}
+              fileUrl={variant.fileUrl}
               style={variant.style}
               weight={variant.weight}
               text={text || DEFAULT_TEXT}

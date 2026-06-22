@@ -1,26 +1,18 @@
 import { useEffect, useState } from "react";
 
 interface FontPreviewProps {
-  apiBase: string;
   familyId: string;
   variantId: string;
+  fileUrl: string;
   style: string;
   weight: number;
   text: string;
 }
 
-function fontFileUrl(
-  apiBase: string,
-  familyId: string,
-  variantId: string,
-): string {
-  return `${apiBase}/api/fonts/${familyId}/${variantId}.woff2`;
-}
-
 export function FontPreview({
-  apiBase,
   familyId,
   variantId,
+  fileUrl,
   style,
   weight,
   text,
@@ -30,14 +22,10 @@ export function FontPreview({
 
   useEffect(() => {
     let isCurrent = true;
-    const fontFace = new FontFace(
-      fontFamilyName,
-      `url(${fontFileUrl(apiBase, familyId, variantId)})`,
-      {
-        style,
-        weight: weight.toString(),
-      },
-    );
+    const fontFace = new FontFace(fontFamilyName, `url(${fileUrl})`, {
+      style,
+      weight: weight.toString(),
+    });
     fontFace.load().then((loadedFace) => {
       if (!isCurrent) return;
       document.fonts.add(loadedFace);
@@ -46,7 +34,7 @@ export function FontPreview({
     return () => {
       isCurrent = false;
     };
-  }, [apiBase, familyId, variantId, style, weight, fontFamilyName]);
+  }, [fileUrl, style, weight, fontFamilyName]);
 
   return (
     <div className="py-lg border-b border-ink-border">

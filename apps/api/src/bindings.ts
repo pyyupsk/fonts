@@ -1,4 +1,4 @@
 export interface Bindings {
   DB: D1Database;
-  FONTS_BUCKET: R2Bucket;
+  FONTS_PUBLIC_BASE: string;
 }

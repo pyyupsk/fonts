@@ -6,10 +6,10 @@ interface Variant {
   id: string;
   style: string;
   weight: number;
+  fileUrl: string;
 }
 
 interface VariableFontSpecimenProps {
-  apiBase: string;
   familyId: string;
   variants: Variant[];
   wghtMin: number;
@@ -17,16 +17,7 @@ interface VariableFontSpecimenProps {
   text: string;
 }
 
-function fontFileUrl(
-  apiBase: string,
-  familyId: string,
-  variantId: string,
-): string {
-  return `${apiBase}/api/fonts/${familyId}/${variantId}.woff2`;
-}
-
 export function VariableFontSpecimen({
-  apiBase,
   familyId,
   variants,
   wghtMin,
@@ -55,14 +46,10 @@ export function VariableFontSpecimen({
     if (!variant) return;
 
     let isCurrent = true;
-    const fontFace = new FontFace(
-      fontFamilyName,
-      `url(${fontFileUrl(apiBase, familyId, variant.id)})`,
-      {
-        style: selectedStyle,
-        weight: `${wghtMin} ${wghtMax}`,
-      },
-    );
+    const fontFace = new FontFace(fontFamilyName, `url(${variant.fileUrl})`, {
+      style: selectedStyle,
+      weight: `${wghtMin} ${wghtMax}`,
+    });
     fontFace.load().then((loadedFace) => {
       if (!isCurrent) return;
       document.fonts.add(loadedFace);
@@ -71,15 +58,7 @@ export function VariableFontSpecimen({
     return () => {
       isCurrent = false;
     };
-  }, [
-    apiBase,
-    familyId,
-    variants,
-    selectedStyle,
-    wghtMin,
-    wghtMax,
-    fontFamilyName,
-  ]);
+  }, [variants, selectedStyle, wghtMin, wghtMax, fontFamilyName]);
 
   return (
     <div className="py-lg border-b border-ink-border">

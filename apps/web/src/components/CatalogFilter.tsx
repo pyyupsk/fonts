@@ -12,14 +12,13 @@ export interface CatalogEntry {
   designer: string;
   category: string;
   license: string;
-  defaultVariantId: string;
+  defaultFileUrl: string;
   weights: number[];
   styles: string[];
   subsets: string[];
 }
 
 interface CatalogFilterProps {
-  apiBase: string;
   catalog: CatalogEntry[];
 }
 
@@ -30,10 +29,7 @@ function readParam(name: string): string {
   );
 }
 
-export function CatalogFilter({
-  apiBase,
-  catalog,
-}: Readonly<CatalogFilterProps>) {
+export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
   const [search, setSearch] = useState(() =>
     readParam("q") === ALL ? "" : readParam("q"),
   );
@@ -244,9 +240,8 @@ export function CatalogFilter({
           {visible.map((entry) => (
             <FontRow
               key={entry.id}
-              apiBase={apiBase}
               familyId={entry.id}
-              defaultVariantId={entry.defaultVariantId}
+              defaultFileUrl={entry.defaultFileUrl}
               name={entry.name}
               designer={entry.designer}
               category={entry.category}
