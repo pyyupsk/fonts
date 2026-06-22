@@ -98,8 +98,8 @@ export function VariableFontSpecimen({
           ))}
         </div>
       </div>
-      <p
-        className="text-[clamp(1.5rem,3vw,2.5rem)] leading-tight"
+      <pre
+        className="text-[clamp(1.5rem,3vw,2.5rem)] leading-tight text-wrap"
         style={{
           fontFamily:
             loadedStyle === selectedStyle ? fontFamilyName : "var(--font-sans)",
@@ -108,7 +108,7 @@ export function VariableFontSpecimen({
         }}
       >
         {text}
-      </p>
+      </pre>
     </div>
   );
 }

@@ -42,7 +42,7 @@ export function FontPreview({
         {weight} {style}
       </p>
       <p
-        className="text-[clamp(1.5rem,3vw,2.5rem)] leading-tight"
+        className="text-[clamp(1.5rem,3vw,2.5rem)] leading-tight whitespace-pre-line"
         style={{
           fontFamily: loaded ? fontFamilyName : "var(--font-sans)",
           fontStyle: style === "italic" ? "italic" : "normal",
