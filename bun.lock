@@ -12,8 +12,10 @@
       "name": "@fonts/api",
       "version": "0.0.0",
       "dependencies": {
+        "@hono/zod-validator": "^0.8.0",
         "drizzle-orm": "^0.45.2",
         "hono": "^4.12.26",
+        "zod": "^4.4.3",
       },
       "devDependencies": {
         "@cloudflare/workers-types": "^4.20260621.1",
@@ -325,6 +327,8 @@
     "@fonts/tsconfig": ["@fonts/tsconfig@workspace:packages/tsconfig"],
 
     "@fonts/web": ["@fonts/web@workspace:apps/web"],
+
+    "@hono/zod-validator": ["@hono/zod-validator@0.8.0", "", { "peerDependencies": { "hono": ">=4.10.0", "zod": "^3.25.0 || ^4.0.0" } }, "sha512-5uS4S1/LKtZQYvD4BtpPUFkOv8d1wNxHHrChm26buMiEYc1FrHWvDUaKVBwkiVtvSExHSpLGDvcnpI2Copyj9w=="],
 
     "@img/colour": ["@img/colour@1.1.0", "", {}, "sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ=="],
 

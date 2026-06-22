@@ -1,6 +1,8 @@
+import { zValidator } from "@hono/zod-validator";
 import { drizzle } from "drizzle-orm/d1";
 import { and, eq, like } from "drizzle-orm";
 import { Hono } from "hono";
+import { z } from "zod";
 import { families } from "@fonts/db/schema/families";
 import { familySubsets } from "@fonts/db/schema/family-subsets";
 import { files } from "@fonts/db/schema/files";
@@ -8,12 +10,20 @@ import { subsets } from "@fonts/db/schema/subsets";
 import { variants } from "@fonts/db/schema/variants";
 import type { Bindings } from "../bindings";
 
+const listQuerySchema = z.object({
+  category: z.string().min(1).optional(),
+  license: z.string().min(1).optional(),
+  search: z.string().min(1).max(100).optional(),
+});
+
+const familyParamSchema = z.object({
+  family: z.string().min(1).max(100),
+});
+
 export const fontsRoute = new Hono<{ Bindings: Bindings }>()
-  .get("/", async (c) => {
+  .get("/", zValidator("query", listQuerySchema), async (c) => {
     const db = drizzle(c.env.DB);
-    const category = c.req.query("category");
-    const license = c.req.query("license");
-    const search = c.req.query("search");
+    const { category, license, search } = c.req.valid("query");
 
     const conditions = [
       category ? eq(families.category, category) : undefined,
@@ -28,9 +38,9 @@ export const fontsRoute = new Hono<{ Bindings: Bindings }>()
 
     return c.json({ families: rows });
   })
-  .get("/:family", async (c) => {
+  .get("/:family", zValidator("param", familyParamSchema), async (c) => {
     const db = drizzle(c.env.DB);
-    const familyId = c.req.param("family");
+    const { family: familyId } = c.req.valid("param");
 
     const [family] = await db.select().from(families).where(eq(families.id, familyId));
     if (!family) {
