@@ -5,6 +5,7 @@ import { PutObjectCommand, type S3Client } from "@aws-sdk/client-s3";
 import { $ } from "bun";
 import { mapFamily, slugify } from "../parse/map-to-rows";
 import { parseMetadata } from "../parse/parse-metadata";
+import { fetchExistingChecksums } from "./d1-client";
 
 const FONTS_DATA_ROOT = join(import.meta.dirname, "../../../fonts");
 const WORK_DIR = join(import.meta.dirname, "../../.out/woff2");
@@ -15,6 +16,7 @@ export interface ConvertedFile {
   r2Key: string;
   fileSize: number;
   checksumSha256: string;
+  sourceChecksumSha256: string;
 }
 
 export async function convertFamilyFiles(
@@ -33,8 +35,21 @@ export async function convertFamilyFiles(
 
   const converted: ConvertedFile[] = [];
 
+  const variantIds = metadata.fonts.map((font) => `${family.id}-${font.weight}-${font.style}`);
+  const existingChecksums = await fetchExistingChecksums(variantIds);
+
   for (const font of metadata.fonts) {
     const srcPath = join(familyPath, font.filename);
+    const variantId = `${family.id}-${font.weight}-${font.style}`;
+
+    const sourceBuffer = await readFile(srcPath);
+    const sourceChecksumSha256 = createHash("sha256").update(sourceBuffer).digest("hex");
+
+    if (existingChecksums.get(variantId) === sourceChecksumSha256) {
+      console.log(`  skip (unchanged): ${variantId}`);
+      continue;
+    }
+
     const ttfCopyPath = join(outDir, font.filename);
     await copyFile(srcPath, ttfCopyPath);
 
@@ -43,7 +58,6 @@ export async function convertFamilyFiles(
     const woff2Path = ttfCopyPath.replace(/\.ttf$/, ".woff2");
     const fileBuffer = await readFile(woff2Path);
     const checksumSha256 = createHash("sha256").update(fileBuffer).digest("hex");
-    const variantId = `${family.id}-${font.weight}-${font.style}`;
     const r2Key = `fonts/${license}/${family.id}/${slugify(family.id)}-${font.weight}-${font.style}.woff2`;
 
     await s3Client.send(
@@ -60,6 +74,7 @@ export async function convertFamilyFiles(
       r2Key,
       fileSize: fileBuffer.length,
       checksumSha256,
+      sourceChecksumSha256,
     });
   }
 

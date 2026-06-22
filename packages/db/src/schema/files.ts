@@ -12,6 +12,7 @@ export const files = sqliteTable(
     r2Key: text("r2_key").notNull(),
     fileSize: integer("file_size").notNull(),
     checksumSha256: text("checksum_sha256").notNull(),
+    sourceChecksumSha256: text("source_checksum_sha256").notNull(),
   },
   (table) => [index("files_variant_idx").on(table.variantId)],
 );

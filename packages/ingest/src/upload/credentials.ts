@@ -24,6 +24,13 @@ export async function loadCloudflareApiToken(): Promise<string> {
   return readSecretFile(".cloudflare-token", SECRET_SCHEMA);
 }
 
+export async function loadCloudflareAccountId(): Promise<string> {
+  if (process.env.CLOUDFLARE_ACCOUNT_ID) {
+    return SECRET_SCHEMA.parse(process.env.CLOUDFLARE_ACCOUNT_ID);
+  }
+  return readSecretFile(".cloudflare-account-id", SECRET_SCHEMA);
+}
+
 export async function createR2Client(): Promise<S3Client> {
   const [accessKeyId, secretAccessKey, endpoint] = await Promise.all([
     readSecretFile(".r2-access-key-id", SECRET_SCHEMA),

@@ -1,0 +1,1 @@
+ALTER TABLE `files` ADD `source_checksum_sha256` text DEFAULT '' NOT NULL;

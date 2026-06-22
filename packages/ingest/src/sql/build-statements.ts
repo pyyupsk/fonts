@@ -103,10 +103,16 @@ export function buildFileStatements(converted: ConvertedFile[]): string[] {
           r2Key: file.r2Key,
           fileSize: file.fileSize,
           checksumSha256: file.checksumSha256,
+          sourceChecksumSha256: file.sourceChecksumSha256,
         })
         .onConflictDoUpdate({
           target: files.id,
-          set: { r2Key: file.r2Key, fileSize: file.fileSize, checksumSha256: file.checksumSha256 },
+          set: {
+            r2Key: file.r2Key,
+            fileSize: file.fileSize,
+            checksumSha256: file.checksumSha256,
+            sourceChecksumSha256: file.sourceChecksumSha256,
+          },
         })
         .toSQL(),
     ),
