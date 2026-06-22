@@ -5,7 +5,7 @@ import type { CatalogEntry } from "../components/catalog/catalog-filter.tsx";
 import { getAllFamilies, getAllFamilyDetails } from "../lib/build-data";
 
 const families = await getAllFamilies();
-const details = await getAllFamilyDetails(families);
+const details = await getAllFamilyDetails();
 
 const catalog: CatalogEntry[] = families.map((family) => {
   const detail = details.get(family.id);

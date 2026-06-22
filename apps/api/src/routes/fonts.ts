@@ -38,33 +38,88 @@ export const fontsRoute = new Hono<{ Bindings: Bindings }>()
 
     return c.json({ families: rows });
   })
+  .get("/full", async (c) => {
+    const db = drizzle(c.env.DB);
+
+    const [familyRows, variantRows, subsetRows] = await Promise.all([
+      db.select().from(families),
+      db
+        .select({
+          id: variants.id,
+          familyId: variants.familyId,
+          style: variants.style,
+          weight: variants.weight,
+          postScriptName: variants.postScriptName,
+          r2Key: files.r2Key,
+        })
+        .from(variants)
+        .innerJoin(files, eq(files.variantId, variants.id)),
+      db
+        .select({ familyId: familySubsets.familyId, id: subsets.id, name: subsets.name })
+        .from(familySubsets)
+        .innerJoin(subsets, eq(subsets.id, familySubsets.subsetId)),
+    ]);
+
+    interface VariantWithFileUrl {
+      id: string;
+      familyId: string;
+      style: string;
+      weight: number;
+      postScriptName: string;
+      fileUrl: string;
+    }
+
+    const variantsByFamily = new Map<string, VariantWithFileUrl[]>();
+    for (const { r2Key, ...variant } of variantRows) {
+      const fileUrl = `${c.env.FONTS_PUBLIC_BASE}/${r2Key}`;
+      const list = variantsByFamily.get(variant.familyId) ?? [];
+      list.push({ ...variant, fileUrl });
+      variantsByFamily.set(variant.familyId, list);
+    }
+
+    const subsetsByFamily = new Map<string, { id: string; name: string }[]>();
+    for (const { familyId, id, name } of subsetRows) {
+      const list = subsetsByFamily.get(familyId) ?? [];
+      list.push({ id, name });
+      subsetsByFamily.set(familyId, list);
+    }
+
+    return c.json({
+      families: familyRows.map((family) => ({
+        family,
+        variants: variantsByFamily.get(family.id) ?? [],
+        subsets: subsetsByFamily.get(family.id) ?? [],
+      })),
+    });
+  })
   .get("/:family", zValidator("param", familyParamSchema), async (c) => {
     const db = drizzle(c.env.DB);
     const { family: familyId } = c.req.valid("param");
 
-    const [family] = await db.select().from(families).where(eq(families.id, familyId));
+    const [[family], familyVariants, familySubsetRows] = await Promise.all([
+      db.select().from(families).where(eq(families.id, familyId)),
+      db
+        .select({
+          id: variants.id,
+          familyId: variants.familyId,
+          style: variants.style,
+          weight: variants.weight,
+          postScriptName: variants.postScriptName,
+          r2Key: files.r2Key,
+        })
+        .from(variants)
+        .innerJoin(files, eq(files.variantId, variants.id))
+        .where(eq(variants.familyId, familyId)),
+      db
+        .select({ id: subsets.id, name: subsets.name })
+        .from(familySubsets)
+        .innerJoin(subsets, eq(subsets.id, familySubsets.subsetId))
+        .where(eq(familySubsets.familyId, familyId)),
+    ]);
+
     if (!family) {
       return c.json({ error: "family not found" }, 404);
     }
-
-    const familyVariants = await db
-      .select({
-        id: variants.id,
-        familyId: variants.familyId,
-        style: variants.style,
-        weight: variants.weight,
-        postScriptName: variants.postScriptName,
-        r2Key: files.r2Key,
-      })
-      .from(variants)
-      .innerJoin(files, eq(files.variantId, variants.id))
-      .where(eq(variants.familyId, familyId));
-
-    const familySubsetRows = await db
-      .select({ id: subsets.id, name: subsets.name })
-      .from(familySubsets)
-      .innerJoin(subsets, eq(subsets.id, familySubsets.subsetId))
-      .where(eq(familySubsets.familyId, familyId));
 
     return c.json({
       family,

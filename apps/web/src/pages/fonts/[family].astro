@@ -9,7 +9,7 @@ import { highlightCss } from "../../lib/highlight-css";
 
 export async function getStaticPaths() {
   const families = await getAllFamilies();
-  const details = await getAllFamilyDetails(families);
+  const details = await getAllFamilyDetails();
 
   return families
     .filter((family) => details.has(family.id))

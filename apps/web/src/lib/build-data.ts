@@ -1,11 +1,8 @@
 import { hc } from "hono/client";
-import pLimit from "p-limit";
 import type { AppType } from "@fonts/api";
 
 const API_BASE = import.meta.env.API_BASE;
 const client = hc<AppType>(API_BASE).api.fonts;
-
-const DETAIL_CONCURRENCY = 20;
 
 export interface FamilySummary {
   id: string;
@@ -40,37 +37,19 @@ export interface FamilyDetail {
   subsets: FamilySubset[];
 }
 
-let familiesCache: Promise<FamilySummary[]> | undefined;
+let fullCache: Promise<FamilyDetail[]> | undefined;
 
-export function getAllFamilies(): Promise<FamilySummary[]> {
-  familiesCache ??= client.$get().then(async (response) => (await response.json()).families);
-  return familiesCache;
+function getAllFamilyDetailsList(): Promise<FamilyDetail[]> {
+  fullCache ??= client.full.$get().then(async (response) => (await response.json()).families);
+  return fullCache;
 }
 
-export async function getFamilyDetail(familyId: string): Promise<FamilyDetail | undefined> {
-  const response = await client[":family"].$get({ param: { family: familyId } });
-  if (response.status === 404) return undefined;
-  return await response.json();
+export async function getAllFamilies(): Promise<FamilySummary[]> {
+  const details = await getAllFamilyDetailsList();
+  return details.map((detail) => detail.family);
 }
 
-let detailsCache: Promise<Map<string, FamilyDetail>> | undefined;
-
-export function getAllFamilyDetails(families: FamilySummary[]): Promise<Map<string, FamilyDetail>> {
-  detailsCache ??= (async () => {
-    const details = new Map<string, FamilyDetail>();
-    const limitConcurrency = pLimit(DETAIL_CONCURRENCY);
-
-    await Promise.all(
-      families.map((family) =>
-        limitConcurrency(async () => {
-          const detail = await getFamilyDetail(family.id);
-          if (detail) details.set(family.id, detail);
-        }),
-      ),
-    );
-
-    return details;
-  })();
-
-  return detailsCache;
+export async function getAllFamilyDetails(): Promise<Map<string, FamilyDetail>> {
+  const details = await getAllFamilyDetailsList();
+  return new Map(details.map((detail) => [detail.family.id, detail]));
 }
