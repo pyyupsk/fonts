@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FontPreview } from "./FontPreview";
-import { Input } from "./ui/Input";
+import { Textarea } from "./ui/Textarea";
 import { VariableFontSpecimen } from "./VariableFontSpecimen";
 
 const DEFAULT_TEXT = `Everyone has the right to freedom of thought, conscience and religion; this right includes freedom to change his religion or belief, and freedom, either alone or in community with others and in public or private, to manifest his religion or belief in teaching, practice, worship and observance.
@@ -38,13 +38,13 @@ export function FontSpecimenList({
       >
         Preview text
       </label>
-      <Input
+      <Textarea
         id="preview-text"
-        type="text"
         value={text}
         onChange={(event) => setText(event.target.value)}
         placeholder="Type your own preview text…"
         className="w-full mb-md"
+        rows={3}
       />
       {isVariable ? (
         <div className="border-t border-ink-border">
