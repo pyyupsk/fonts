@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FontRow } from "./FontRow";
-import { Input } from "./ui/Input";
-import { Select } from "./ui/Select";
+import { FontRow } from "../font/font-row";
+import { Input } from "../ui/input";
+import { Select } from "../ui/select";
 
 const BATCH_SIZE = 60;
 const ALL = "all";

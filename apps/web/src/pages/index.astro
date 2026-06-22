@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { CatalogFilter } from "../components/CatalogFilter.tsx";
-import type { CatalogEntry } from "../components/CatalogFilter.tsx";
+import { CatalogFilter } from "../components/catalog/catalog-filter.tsx";
+import type { CatalogEntry } from "../components/catalog/catalog-filter.tsx";
 import { getAllFamilies, getAllFamilyDetails } from "../lib/build-data";
 
 const families = await getAllFamilies();
