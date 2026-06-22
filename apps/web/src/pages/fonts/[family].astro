@@ -21,6 +21,17 @@ export async function getStaticPaths() {
 
 const { detail } = Astro.props;
 
+const description = `Download ${detail.family.name} by ${detail.family.designer} — ${detail.family.category}, ${detail.family.license} license. Self-hosted .woff2 with copy-paste @font-face embed.`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  name: detail.family.name,
+  creator: detail.family.designer,
+  license: detail.family.license,
+  genre: detail.family.category,
+};
+
 const embedSnippets = await Promise.all(
   detail.variants.map(async (variant) => {
     const code = buildEmbedSnippet({
@@ -40,7 +51,12 @@ const embedSnippets = await Promise.all(
 );
 ---
 
-<BaseLayout title={`${detail.family.name} — Fonts`}>
+<BaseLayout title={`${detail.family.name} — Fonts`} description={description}>
+  <script
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(jsonLd)}
+  />
   <BackLink client:load />
   <h1
     class="font-display text-display font-normal leading-[0.95] tracking-[-0.02em] mt-sm mb-sm"
