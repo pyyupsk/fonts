@@ -1,0 +1,25 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Page not found — Fonts">
+  <div class="py-2xl">
+    <h1
+      class="font-display text-display font-normal leading-[0.95] tracking-[-0.02em] mb-sm"
+    >
+      404
+    </h1>
+    <p
+      class="max-w-[42ch] text-pretty text-paper-muted text-[clamp(1rem,1.6vw,1.25rem)] mb-lg"
+    >
+      This page doesn't exist, or the font you're looking for isn't in the
+      catalog.
+    </p>
+    <a
+      href="/"
+      class="inline-flex items-center min-h-11 px-sm -mx-sm text-label text-paper-muted hover:text-accent transition-colors duration-fast ease-out-quart"
+    >
+      ← Back to the catalog
+    </a>
+  </div>
+</BaseLayout>
