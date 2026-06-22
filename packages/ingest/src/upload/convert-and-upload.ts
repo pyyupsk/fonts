@@ -66,6 +66,7 @@ export async function convertFamilyFiles(
         Key: r2Key,
         Body: fileBuffer,
         ContentType: "font/woff2",
+        CacheControl: "public, max-age=31536000, immutable",
       }),
     );
 
