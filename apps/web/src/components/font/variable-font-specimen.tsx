@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { variableFontFamilyName } from "../../lib/font-family-name";
+import { SpecimenSkeleton, useFontLoaded } from "./font-preview";
 
 const WEIGHT_STOPS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
 
@@ -39,6 +40,7 @@ export function VariableFontSpecimen({
     weightStops.includes(400) ? 400 : (weightStops[0] ?? wghtMin),
   );
   const fontFamilyName = variableFontFamilyName(familyId, selectedStyle);
+  const loaded = useFontLoaded(fontFamilyName, selectedWeight, selectedStyle);
 
   return (
     <div className="py-lg border-b border-ink-border">
@@ -78,16 +80,24 @@ export function VariableFontSpecimen({
           ))}
         </div>
       </div>
-      <pre
-        className="text-[clamp(1.5rem,3vw,2.5rem)] leading-tight text-wrap"
-        style={{
-          fontFamily: `"${fontFamilyName}", var(--font-sans)`,
-          fontStyle: selectedStyle === "italic" ? "italic" : "normal",
-          fontWeight: selectedWeight,
-        }}
-      >
-        {text}
-      </pre>
+      <div className="relative">
+        {!loaded && (
+          <div className="absolute inset-0">
+            <SpecimenSkeleton />
+          </div>
+        )}
+        <pre
+          className="text-[clamp(1.5rem,3vw,2.5rem)] leading-tight text-wrap transition-opacity duration-base ease-out-quart"
+          style={{
+            fontFamily: `"${fontFamilyName}", var(--font-sans)`,
+            fontStyle: selectedStyle === "italic" ? "italic" : "normal",
+            fontWeight: selectedWeight,
+            opacity: loaded ? 1 : 0,
+          }}
+        >
+          {text}
+        </pre>
+      </div>
     </div>
   );
 }

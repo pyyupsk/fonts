@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { loadFont } from "../../lib/load-font";
+import { Skeleton } from "../ui/skeleton";
 
 interface FontRowProps {
   familyId: string;
@@ -52,24 +53,29 @@ export function FontRow({
     };
   }, [defaultFileUrl, fontFamilyName]);
 
+  const staggerDelay = `${(index % STAGGER_SLOTS) * STAGGER_STEP_MS}ms`;
+
   return (
     <a
-      className="flex flex-wrap items-baseline justify-between gap-sm gap-x-lg py-md border-b border-ink-border text-paper no-underline transition-[opacity,transform,color] duration-normal ease-out-quart hover:text-accent focus-visible:text-accent"
+      className="flex flex-wrap items-baseline justify-between gap-sm gap-x-lg py-md border-b border-ink-border text-paper no-underline transition-colors duration-fast ease-out-quart hover:text-accent focus-visible:text-accent"
       href={`/fonts/${familyId}/`}
       ref={rowRef}
-      style={{
-        opacity: loaded ? 1 : 0,
-        transform: loaded ? "none" : "translateY(0.5rem)",
-        transitionDelay: loaded
-          ? `${(index % STAGGER_SLOTS) * STAGGER_STEP_MS}ms`
-          : "0ms",
-      }}
     >
-      <span
-        className="text-row font-normal leading-[1.1]"
-        style={{ fontFamily: fontFamilyName }}
-      >
-        {name}
+      <span className="relative text-row font-normal leading-[1.1]">
+        {!loaded && (
+          <Skeleton className="absolute inset-y-1 left-0 w-[8em] max-w-full" />
+        )}
+        <span
+          className="transition-[opacity,transform] duration-base ease-out-quart"
+          style={{
+            fontFamily: fontFamilyName,
+            opacity: loaded ? 1 : 0,
+            transform: loaded ? "none" : "translateY(0.5rem)",
+            transitionDelay: loaded ? staggerDelay : "0ms",
+          }}
+        >
+          {name}
+        </span>
       </span>
       <span className="text-label text-paper-muted whitespace-nowrap uppercase tracking-[0.04em]">
         {designer} · {category} · {license}
