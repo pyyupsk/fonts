@@ -5,7 +5,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "astro check && astro build && node scripts/csp-hashes.mjs",
+    "build": "astro check && astro build",
     "deploy": "wrangler deploy",
     "dev": "astro dev",
     "lint": "eslint .",

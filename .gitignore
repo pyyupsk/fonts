@@ -8,5 +8,6 @@ build
 .astro
 *.wrangler
 *.wrangler-state
+*worker-configuration.d.ts
 .env
 !.env.example
