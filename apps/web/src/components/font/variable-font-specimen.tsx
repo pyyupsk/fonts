@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { variableFontFamilyName } from "../../lib/font-family-name";
-import { SpecimenSkeleton, useFontLoaded } from "./font-preview";
+import { useFontLoaded } from "../../hooks/useFontLoaded";
+import { SpecimenSkeleton } from "./specimen-skeleton";
 
 const WEIGHT_STOPS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
 

@@ -29,6 +29,14 @@ function readParam(name: string): string {
   );
 }
 
+function uniqueSorted<T>(values: T[]): T[] {
+  return [...new Set(values)].sort();
+}
+
+function toOptions(values: string[]): { value: string; label: string }[] {
+  return values.map((value) => ({ value, label: value }));
+}
+
 export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
   const [search, setSearch] = useState(() =>
     readParam("q") === ALL ? "" : readParam("q"),
@@ -254,12 +262,4 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
       {hasMore && <div ref={sentinelRef} className="h-px" aria-hidden="true" />}
     </div>
   );
-}
-
-function uniqueSorted<T>(values: T[]): T[] {
-  return [...new Set(values)].sort();
-}
-
-function toOptions(values: string[]): { value: string; label: string }[] {
-  return values.map((value) => ({ value, label: value }));
 }
