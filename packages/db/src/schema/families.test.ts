@@ -4,7 +4,9 @@ import { families } from "./families";
 
 describe("families schema", () => {
   test("exposes expected columns", () => {
-    expect(Object.keys(getTableColumns(families)).sort((a, b) => a.localeCompare(b))).toEqual(
+    expect(
+      Object.keys(getTableColumns(families)).sort((a, b) => a.localeCompare(b)),
+    ).toEqual(
       [
         "id",
         "name",

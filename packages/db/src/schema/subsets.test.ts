@@ -4,9 +4,9 @@ import { subsets } from "./subsets";
 
 describe("subsets schema", () => {
   test("exposes expected columns", () => {
-    expect(Object.keys(getTableColumns(subsets)).sort((a, b) => a.localeCompare(b))).toEqual(
-      ["id", "name"].sort((a, b) => a.localeCompare(b)),
-    );
+    expect(
+      Object.keys(getTableColumns(subsets)).sort((a, b) => a.localeCompare(b)),
+    ).toEqual(["id", "name"].sort((a, b) => a.localeCompare(b)));
   });
 
   test("id is primary key", () => {

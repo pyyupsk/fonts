@@ -4,7 +4,9 @@ import { files } from "./files";
 
 describe("files schema", () => {
   test("exposes expected columns", () => {
-    expect(Object.keys(getTableColumns(files)).sort((a, b) => a.localeCompare(b))).toEqual(
+    expect(
+      Object.keys(getTableColumns(files)).sort((a, b) => a.localeCompare(b)),
+    ).toEqual(
       [
         "id",
         "variantId",
