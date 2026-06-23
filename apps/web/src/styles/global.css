@@ -35,7 +35,7 @@
 
 @font-face {
   font-family: "Bodoni Moda";
-  src: url("https://fonts.fasu.dev/fonts/ofl/bodoni-moda/bodoni-moda-400-normal.woff2")
+  src: url("https://cdn.fasu.dev/fonts/ofl/bodoni-moda/bodoni-moda-400-normal.woff2")
     format("woff2");
   font-weight: 400;
   font-style: normal;
@@ -44,7 +44,7 @@
 
 @font-face {
   font-family: "Work Sans";
-  src: url("https://fonts.fasu.dev/fonts/ofl/work-sans/work-sans-400-normal.woff2")
+  src: url("https://cdn.fasu.dev/fonts/ofl/work-sans/work-sans-400-normal.woff2")
     format("woff2");
   font-weight: 400;
   font-style: normal;
