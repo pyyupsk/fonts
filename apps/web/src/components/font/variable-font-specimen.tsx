@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { loadFont } from "../../lib/load-font";
 
 const WEIGHT_STOPS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
 
@@ -46,13 +47,11 @@ export function VariableFontSpecimen({
     if (!variant) return;
 
     let isCurrent = true;
-    const fontFace = new FontFace(fontFamilyName, `url(${variant.fileUrl})`, {
+    loadFont(fontFamilyName, variant.fileUrl, {
       style: selectedStyle,
       weight: `${wghtMin} ${wghtMax}`,
-    });
-    fontFace.load().then((loadedFace) => {
-      if (!isCurrent) return;
-      document.fonts.add(loadedFace);
+    }).then((ok) => {
+      if (!isCurrent || !ok) return;
       setLoadedStyle(selectedStyle);
     });
     return () => {

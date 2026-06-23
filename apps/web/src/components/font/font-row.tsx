@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { loadFont } from "../../lib/load-font";
 
 interface FontRowProps {
   familyId: string;
@@ -25,14 +26,14 @@ export function FontRow({
     const element = rowRef.current;
     if (!element) return;
 
+    let isCurrent = true;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) return;
         observer.disconnect();
 
-        const fontFace = new FontFace(fontFamilyName, `url(${defaultFileUrl})`);
-        fontFace.load().then((loadedFace) => {
-          document.fonts.add(loadedFace);
+        loadFont(fontFamilyName, defaultFileUrl).then((ok) => {
+          if (!isCurrent || !ok) return;
           setLoaded(true);
         });
       },
@@ -40,7 +41,10 @@ export function FontRow({
     );
 
     observer.observe(element);
-    return () => observer.disconnect();
+    return () => {
+      isCurrent = false;
+      observer.disconnect();
+    };
   }, [defaultFileUrl, fontFamilyName]);
 
   return (

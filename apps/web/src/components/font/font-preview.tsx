@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { loadFont } from "../../lib/load-font";
 
 interface FontPreviewProps {
   familyId: string;
@@ -22,13 +23,8 @@ export function FontPreview({
 
   useEffect(() => {
     let isCurrent = true;
-    const fontFace = new FontFace(fontFamilyName, `url(${fileUrl})`, {
-      style,
-      weight: weight.toString(),
-    });
-    fontFace.load().then((loadedFace) => {
-      if (!isCurrent) return;
-      document.fonts.add(loadedFace);
+    loadFont(fontFamilyName, fileUrl, { style, weight: weight.toString() }).then((ok) => {
+      if (!isCurrent || !ok) return;
       setLoaded(true);
     });
     return () => {
