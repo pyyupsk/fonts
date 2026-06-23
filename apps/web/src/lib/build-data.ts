@@ -1,8 +1,8 @@
 import { hc } from "hono/client";
+import { API_BASE } from "astro:env/server";
 import type { AppType } from "@fonts/api";
 import { safe } from "./safe";
 
-const API_BASE = import.meta.env.API_BASE;
 const client = hc<AppType>(API_BASE).api.fonts;
 
 const DEFAULT_TIMEOUT_MS = 8000;
