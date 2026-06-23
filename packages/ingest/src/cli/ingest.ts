@@ -91,28 +91,37 @@ async function ingestOne(license: (typeof LICENSES)[number], familyDir: string) 
   console.log(outPath);
 }
 
-const main = defineCommand({
-  meta: { name: "ingest", description: "Ingest Google Fonts family/families into D1 + R2" },
+function isLicense(value: string): value is (typeof LICENSES)[number] {
+  return (LICENSES as readonly string[]).includes(value);
+}
+
+const all = defineCommand({
+  meta: { name: "all", description: "ingest every family under packages/fonts" },
   args: {
-    all: { type: "boolean", description: "ingest every family under packages/fonts" },
-    limit: { type: "string", description: "max families to process (with --all)" },
-    license: { type: "positional", required: false, description: "ofl | apache | ufl" },
-    familyDir: { type: "positional", required: false, description: "family directory name" },
+    limit: { type: "string", description: "max families to process" },
   },
   async run({ args }) {
-    if (args.all) {
-      await ingestAll(args.limit ? Number(args.limit) : undefined);
-      return;
-    }
+    await ingestAll(args.limit ? Number(args.limit) : undefined);
+  },
+});
 
-    if (args.license !== "ofl" && args.license !== "apache" && args.license !== "ufl") {
-      throw new Error("license must be one of: ofl, apache, ufl (or pass --all)");
-    }
-    if (!args.familyDir) {
-      throw new Error("familyDir is required (or pass --all)");
+const one = defineCommand({
+  meta: { name: "one", description: "ingest a single family" },
+  args: {
+    license: { type: "positional", required: true, description: "ofl | apache | ufl" },
+    familyDir: { type: "positional", required: true, description: "family directory name" },
+  },
+  async run({ args }) {
+    if (!isLicense(args.license)) {
+      throw new Error("license must be one of: ofl, apache, ufl");
     }
     await ingestOne(args.license, args.familyDir);
   },
+});
+
+const main = defineCommand({
+  meta: { name: "ingest", description: "Ingest Google Fonts family/families into D1 + R2" },
+  subCommands: { all, one },
 });
 
 runMain(main);
