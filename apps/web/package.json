@@ -10,9 +10,12 @@
     "dev": "astro dev",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "prebuild": "bun run typegen",
     "preview": "wrangler dev",
+    "pretypecheck": "bun run typegen",
     "test": "bun test",
-    "typecheck": "astro check"
+    "typecheck": "astro check",
+    "typegen": "wrangler types"
   },
   "dependencies": {
     "@astrojs/cloudflare": "~12.6.13",
