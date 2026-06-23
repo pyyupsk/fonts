@@ -3,7 +3,11 @@ import { copyFile, mkdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { PutObjectCommand, type S3Client } from "@aws-sdk/client-s3";
 import { $ } from "bun";
-import { mapFamily, slugify } from "@/parse/map-to-rows";
+import {
+  fontFileBasename,
+  isVariableFamily,
+  mapFamily,
+} from "@/parse/map-to-rows";
 import { parseMetadata } from "@/parse/parse-metadata";
 import { fetchExistingChecksums } from "./d1-client";
 
@@ -29,6 +33,7 @@ export async function convertFamilyFiles(
   const raw = await readFile(metadataPath, "utf-8");
   const metadata = parseMetadata(raw);
   const family = mapFamily(metadata);
+  const variable = isVariableFamily(metadata);
 
   const outDir = join(WORK_DIR, family.id);
   await mkdir(outDir, { recursive: true });
@@ -64,7 +69,13 @@ export async function convertFamilyFiles(
     const checksumSha256 = createHash("sha256")
       .update(fileBuffer)
       .digest("hex");
-    const r2Key = `fonts/${license}/${family.id}/${slugify(family.id)}-${font.weight}-${font.style}.woff2`;
+    const basename = fontFileBasename(
+      family.id,
+      font.style,
+      font.weight,
+      variable,
+    );
+    const r2Key = `fonts/${license}/${family.id}/${basename}.woff2`;
 
     await s3Client.send(
       new PutObjectCommand({

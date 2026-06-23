@@ -1,6 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import type { ParsedMetadata } from "./parse-metadata";
-import { mapFamily, mapSubsets, mapVariants, slugify } from "./map-to-rows";
+import {
+  fontFileBasename,
+  isVariableFamily,
+  mapFamily,
+  mapSubsets,
+  mapVariants,
+  slugify,
+} from "./map-to-rows";
 
 const baseMetadata: ParsedMetadata = {
   name: "Roboto Slab",
@@ -60,6 +67,42 @@ describe("mapFamily", () => {
     const row = mapFamily({ ...baseMetadata, axes: [] });
     expect(row.wghtMin).toBeNull();
     expect(row.wghtMax).toBeNull();
+  });
+});
+
+describe("isVariableFamily", () => {
+  test("true when wght axis spans a range", () => {
+    expect(isVariableFamily(baseMetadata)).toBe(true);
+  });
+
+  test("false when no wght axis", () => {
+    expect(isVariableFamily({ ...baseMetadata, axes: [] })).toBe(false);
+  });
+
+  test("false when wght axis is a single point", () => {
+    expect(
+      isVariableFamily({
+        ...baseMetadata,
+        axes: [{ tag: "wght", minValue: 400, maxValue: 400 }],
+      }),
+    ).toBe(false);
+  });
+});
+
+describe("fontFileBasename", () => {
+  test("variable file omits weight", () => {
+    expect(fontFileBasename("roboto", "normal", 400, true)).toBe(
+      "roboto-normal-variable",
+    );
+    expect(fontFileBasename("roboto", "italic", 400, true)).toBe(
+      "roboto-italic-variable",
+    );
+  });
+
+  test("static file includes weight", () => {
+    expect(fontFileBasename("lobster", "normal", 700, false)).toBe(
+      "lobster-normal-700",
+    );
   });
 });
 

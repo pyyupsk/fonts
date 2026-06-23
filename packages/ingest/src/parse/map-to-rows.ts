@@ -47,6 +47,22 @@ export function slugify(name: string): string {
     .replace(/^-|-$/g, "");
 }
 
+export function isVariableFamily(metadata: ParsedMetadata): boolean {
+  const wghtAxis = metadata.axes.find((axis) => axis.tag === "wght");
+  return wghtAxis !== undefined && wghtAxis.minValue < wghtAxis.maxValue;
+}
+
+// variable -> `<id>-<style>-variable`, static -> `<id>-<style>-<weight>`
+export function fontFileBasename(
+  familyId: string,
+  style: string,
+  weight: number,
+  variable: boolean,
+): string {
+  const suffix = variable ? "variable" : String(weight);
+  return `${familyId}-${style}-${suffix}`;
+}
+
 export function mapFamily(metadata: ParsedMetadata): FamilyRow {
   const wghtAxis = metadata.axes.find((axis) => axis.tag === "wght");
 
