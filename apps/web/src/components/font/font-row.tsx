@@ -59,7 +59,7 @@ export function FontRow({
       >
         {name}
       </span>
-      <span className="text-label text-paper-muted whitespace-nowrap">
+      <span className="text-label text-paper-muted whitespace-nowrap uppercase tracking-[0.04em]">
         {designer} · {category} · {license}
       </span>
     </a>

@@ -204,7 +204,7 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
               key={filter.key}
               type="button"
               onClick={filter.clear}
-              className="flex items-center gap-2xs rounded-full border border-ink-border bg-ink-raised px-sm py-2xs text-label text-paper transition-colors duration-fast ease-out-quart hover:text-accent"
+              className="flex items-center gap-2xs rounded border border-ink-border bg-ink-raised px-sm py-2xs text-label text-paper transition-colors duration-fast ease-out-quart hover:text-accent"
             >
               {filter.label}
               <span aria-hidden="true">×</span>

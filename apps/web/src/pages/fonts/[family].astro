@@ -147,7 +147,7 @@ const embedSnippets = await Promise.all(
           return (
             <div class="py-md border-b border-ink-border">
               <div class="flex items-center justify-between gap-md mb-sm">
-                <span class="text-label text-paper">
+                <span class="text-label text-paper-muted">
                   {detail.family.wghtMin !== null &&
                   detail.family.wghtMax !== null &&
                   detail.family.wghtMin < detail.family.wghtMax
@@ -156,7 +156,7 @@ const embedSnippets = await Promise.all(
                   {variant.style}
                 </span>
                 <a
-                  class="text-label text-paper-muted hover:text-accent transition-colors duration-fast ease-out-quart"
+                  class="text-label text-paper hover:text-accent transition-colors duration-fast ease-out-quart"
                   href={variant.fileUrl}
                   download
                 >

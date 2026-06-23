@@ -50,7 +50,7 @@ export function Select({
 
       <BaseSelect.Portal>
         <BaseSelect.Positioner sideOffset={4} className="z-dropdown">
-          <BaseSelect.Popup className="min-w-(--anchor-width) max-h-64 overflow-y-auto rounded border border-ink-border bg-ink-raised py-2xs shadow-lg">
+          <BaseSelect.Popup className="min-w-(--anchor-width) max-h-64 overflow-y-auto rounded border border-ink-border bg-ink-raised py-2xs">
             <BaseSelect.List>
               {options.map((option) => (
                 <BaseSelect.Item
