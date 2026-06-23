@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "astro check && astro build",
-    "deploy": "CLOUDFLARE_API_TOKEN=$(cat ../../.cloudflare-token) wrangler deploy",
+    "deploy": "wrangler deploy",
     "dev": "astro dev",
     "preview": "wrangler dev"
   },
