@@ -44,7 +44,7 @@ export function FontSpecimenList({
         onChange={(event) => setText(event.target.value)}
         placeholder="Type your own preview text…"
         className="w-full mb-md"
-        rows={3}
+        rows={6}
       />
       {isVariable ? (
         <div className="border-t border-ink-border">
