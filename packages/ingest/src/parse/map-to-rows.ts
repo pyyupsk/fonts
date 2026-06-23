@@ -80,11 +80,32 @@ export function mapFamily(metadata: ParsedMetadata): FamilyRow {
   };
 }
 
+// One entry per style for variable families (prefer 400) — one file covers the
+// whole weight range, so named weight instances would be redundant duplicates.
+export function selectFontEntries(
+  metadata: ParsedMetadata,
+): ParsedMetadata["fonts"] {
+  if (!isVariableFamily(metadata)) return metadata.fonts;
+
+  const byStyle = new Map<string, ParsedMetadata["fonts"][number]>();
+  for (const font of metadata.fonts) {
+    const current = byStyle.get(font.style);
+    if (
+      !current ||
+      (current.weight !== 400 &&
+        (font.weight === 400 || font.weight < current.weight))
+    ) {
+      byStyle.set(font.style, font);
+    }
+  }
+  return [...byStyle.values()];
+}
+
 export function mapVariants(
   metadata: ParsedMetadata,
   familyId: string,
 ): VariantRow[] {
-  return metadata.fonts.map((font) => ({
+  return selectFontEntries(metadata).map((font) => ({
     id: `${familyId}-${font.weight}-${font.style}`,
     familyId,
     style: font.style,

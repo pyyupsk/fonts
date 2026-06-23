@@ -6,6 +6,7 @@ import {
   mapFamily,
   mapSubsets,
   mapVariants,
+  selectFontEntries,
   slugify,
 } from "./map-to-rows";
 
@@ -103,6 +104,57 @@ describe("fontFileBasename", () => {
     expect(fontFileBasename("lobster", "normal", 700, false)).toBe(
       "lobster-normal-700",
     );
+  });
+});
+
+describe("selectFontEntries", () => {
+  const variableMultiWeight: ParsedMetadata = {
+    ...baseMetadata,
+    fonts: [100, 400, 700].flatMap((weight) =>
+      (["normal", "italic"] as const).map((style) => ({
+        style,
+        weight,
+        filename: `Font-${weight}-${style}.ttf`,
+        postScriptName: `Font-${weight}-${style}`,
+      })),
+    ),
+  };
+
+  test("keeps one entry per style for variable families, preferring 400", () => {
+    const entries = selectFontEntries(variableMultiWeight);
+    expect(entries).toHaveLength(2);
+    expect(entries.every((font) => font.weight === 400)).toBe(true);
+    expect(
+      entries.map((font) => font.style).sort((a, b) => a.localeCompare(b)),
+    ).toEqual(["italic", "normal"]);
+  });
+
+  test("returns all entries for static families", () => {
+    const staticFamily = { ...variableMultiWeight, axes: [] };
+    expect(selectFontEntries(staticFamily)).toHaveLength(6);
+  });
+
+  test("falls back to lightest weight when no 400", () => {
+    const noDefault: ParsedMetadata = {
+      ...baseMetadata,
+      fonts: [
+        {
+          style: "normal",
+          weight: 700,
+          filename: "a.ttf",
+          postScriptName: "a",
+        },
+        {
+          style: "normal",
+          weight: 300,
+          filename: "b.ttf",
+          postScriptName: "b",
+        },
+      ],
+    };
+    expect(selectFontEntries(noDefault)).toEqual([
+      { style: "normal", weight: 300, filename: "b.ttf", postScriptName: "b" },
+    ]);
   });
 });
 

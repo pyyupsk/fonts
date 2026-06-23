@@ -36,18 +36,18 @@
 
 @font-face {
   font-family: "Bodoni Moda";
-  src: url("https://cdn.fasu.dev/fonts/ofl/bodoni-moda/bodoni-moda-400-normal.woff2")
+  src: url("https://cdn.fasu.dev/fonts/ofl/bodoni-moda/bodoni-moda-normal-variable.woff2")
     format("woff2");
-  font-weight: 400;
+  font-weight: 400 900;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Work Sans";
-  src: url("https://cdn.fasu.dev/fonts/ofl/work-sans/work-sans-400-normal.woff2")
+  src: url("https://cdn.fasu.dev/fonts/ofl/work-sans/work-sans-normal-variable.woff2")
     format("woff2");
-  font-weight: 400;
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }

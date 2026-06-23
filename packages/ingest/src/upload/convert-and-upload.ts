@@ -7,6 +7,7 @@ import {
   fontFileBasename,
   isVariableFamily,
   mapFamily,
+  selectFontEntries,
 } from "@/parse/map-to-rows";
 import { parseMetadata } from "@/parse/parse-metadata";
 import { fetchExistingChecksums } from "./d1-client";
@@ -34,18 +35,19 @@ export async function convertFamilyFiles(
   const metadata = parseMetadata(raw);
   const family = mapFamily(metadata);
   const variable = isVariableFamily(metadata);
+  const fonts = selectFontEntries(metadata);
 
   const outDir = join(WORK_DIR, family.id);
   await mkdir(outDir, { recursive: true });
 
   const converted: ConvertedFile[] = [];
 
-  const variantIds = metadata.fonts.map(
+  const variantIds = fonts.map(
     (font) => `${family.id}-${font.weight}-${font.style}`,
   );
   const existingChecksums = await fetchExistingChecksums(variantIds);
 
-  for (const font of metadata.fonts) {
+  for (const font of fonts) {
     const srcPath = join(familyPath, font.filename);
     const variantId = `${family.id}-${font.weight}-${font.style}`;
 
