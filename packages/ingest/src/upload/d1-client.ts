@@ -9,7 +9,8 @@ interface D1QueryResponse<T> {
 }
 
 export async function queryD1<T>(sql: string, params: unknown[]): Promise<T[]> {
-  const [token, accountId] = await Promise.all([loadCloudflareApiToken(), loadCloudflareAccountId()]);
+  const token = loadCloudflareApiToken();
+  const accountId = loadCloudflareAccountId();
 
   const res = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${DATABASE_ID}/query`,

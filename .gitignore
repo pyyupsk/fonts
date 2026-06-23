@@ -8,10 +8,5 @@ build
 .astro
 *.wrangler
 *.wrangler-state
-.cloudflare-token
-.cloudflare-account-id
-.r2-access-key-id
-.r2-secret-access-key
-.r2-endpoint
 .env
 !.env.example

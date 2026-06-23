@@ -10,7 +10,7 @@ async function main() {
   const rows = await queryD1<{ r2_key: string }>("SELECT r2_key FROM files", []);
   console.log(`backfilling Cache-Control on ${rows.length} R2 objects`);
 
-  const s3Client = await createR2Client();
+  const s3Client = createR2Client();
   const limitConcurrency = pLimit(CONCURRENCY);
   let completed = 0;
 

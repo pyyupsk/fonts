@@ -1,46 +1,32 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { S3Client } from "@aws-sdk/client-s3";
 import { z } from "zod";
-
-const REPO_ROOT = join(import.meta.dirname, "../../../..");
 
 const SECRET_SCHEMA = z.string().trim().min(1);
 const ENDPOINT_SCHEMA = z.url().trim();
 
-async function readSecretFile<T>(fileName: string, schema: z.ZodType<T>): Promise<T> {
-  const raw = await readFile(join(REPO_ROOT, fileName), "utf-8");
-  const result = schema.safeParse(raw);
+function readEnvVar<T>(name: string, schema: z.ZodType<T>): T {
+  const result = schema.safeParse(process.env[name]);
   if (!result.success) {
-    throw new Error(`invalid contents in ${fileName}: ${result.error.message}`);
+    throw new Error(`missing or invalid env var ${name}: ${result.error.message}`);
   }
   return result.data;
 }
 
-export async function loadCloudflareApiToken(): Promise<string> {
-  if (process.env.CLOUDFLARE_API_TOKEN) {
-    return SECRET_SCHEMA.parse(process.env.CLOUDFLARE_API_TOKEN);
-  }
-  return readSecretFile(".cloudflare-token", SECRET_SCHEMA);
+export function loadCloudflareApiToken(): string {
+  return readEnvVar("CLOUDFLARE_API_TOKEN", SECRET_SCHEMA);
 }
 
-export async function loadCloudflareAccountId(): Promise<string> {
-  if (process.env.CLOUDFLARE_ACCOUNT_ID) {
-    return SECRET_SCHEMA.parse(process.env.CLOUDFLARE_ACCOUNT_ID);
-  }
-  return readSecretFile(".cloudflare-account-id", SECRET_SCHEMA);
+export function loadCloudflareAccountId(): string {
+  return readEnvVar("CLOUDFLARE_ACCOUNT_ID", SECRET_SCHEMA);
 }
 
-export async function createR2Client(): Promise<S3Client> {
-  const [accessKeyId, secretAccessKey, endpoint] = await Promise.all([
-    readSecretFile(".r2-access-key-id", SECRET_SCHEMA),
-    readSecretFile(".r2-secret-access-key", SECRET_SCHEMA),
-    readSecretFile(".r2-endpoint", ENDPOINT_SCHEMA),
-  ]);
-
+export function createR2Client(): S3Client {
   return new S3Client({
     region: "auto",
-    endpoint,
-    credentials: { accessKeyId, secretAccessKey },
+    endpoint: readEnvVar("R2_ENDPOINT", ENDPOINT_SCHEMA),
+    credentials: {
+      accessKeyId: readEnvVar("R2_ACCESS_KEY_ID", SECRET_SCHEMA),
+      secretAccessKey: readEnvVar("R2_SECRET_ACCESS_KEY", SECRET_SCHEMA),
+    },
   });
 }

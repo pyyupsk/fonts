@@ -31,7 +31,7 @@ async function listFamilyTargets(): Promise<FamilyTarget[]> {
 }
 
 async function ingestAll(limit: number | undefined) {
-  const s3Client = await createR2Client();
+  const s3Client = createR2Client();
 
   const allTargets = await listFamilyTargets();
   const targets = limit ? allTargets.slice(0, limit) : allTargets;
@@ -74,7 +74,7 @@ async function ingestAll(limit: number | undefined) {
 }
 
 async function ingestOne(license: (typeof LICENSES)[number], familyDir: string) {
-  const s3Client = await createR2Client();
+  const s3Client = createR2Client();
 
   const { family, variants, subsets } = await loadFamilyRows(license, familyDir);
   const converted = await convertFamilyFiles(license, familyDir, s3Client);
