@@ -4,7 +4,7 @@ import { families } from "./families";
 
 describe("families schema", () => {
   test("exposes expected columns", () => {
-    expect(Object.keys(getTableColumns(families)).sort()).toEqual(
+    expect(Object.keys(getTableColumns(families)).sort((a, b) => a.localeCompare(b))).toEqual(
       [
         "id",
         "name",
@@ -16,7 +16,7 @@ describe("families schema", () => {
         "sourceRepositoryUrl",
         "wghtMin",
         "wghtMax",
-      ].sort(),
+      ].sort((a, b) => a.localeCompare(b)),
     );
   });
 

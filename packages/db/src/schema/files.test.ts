@@ -4,7 +4,7 @@ import { files } from "./files";
 
 describe("files schema", () => {
   test("exposes expected columns", () => {
-    expect(Object.keys(getTableColumns(files)).sort()).toEqual(
+    expect(Object.keys(getTableColumns(files)).sort((a, b) => a.localeCompare(b))).toEqual(
       [
         "id",
         "variantId",
@@ -13,7 +13,7 @@ describe("files schema", () => {
         "fileSize",
         "checksumSha256",
         "sourceChecksumSha256",
-      ].sort(),
+      ].sort((a, b) => a.localeCompare(b)),
     );
   });
 

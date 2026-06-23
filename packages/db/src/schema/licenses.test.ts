@@ -4,8 +4,8 @@ import { licenses } from "./licenses";
 
 describe("licenses schema", () => {
   test("exposes expected columns", () => {
-    expect(Object.keys(getTableColumns(licenses)).sort()).toEqual(
-      ["id", "name", "url"].sort(),
+    expect(Object.keys(getTableColumns(licenses)).sort((a, b) => a.localeCompare(b))).toEqual(
+      ["id", "name", "url"].sort((a, b) => a.localeCompare(b)),
     );
   });
 
