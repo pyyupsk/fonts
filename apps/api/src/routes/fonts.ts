@@ -13,7 +13,7 @@ import {
   groupSubsetsByFamily,
   groupVariantsByFamily,
   toVariantWithFileUrl,
-} from "./fonts-transform";
+} from "../lib/fonts-transform";
 
 export const listQuerySchema = z.object({
   category: z.string().min(1).optional(),
