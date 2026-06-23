@@ -12,6 +12,7 @@
     "dev:local": "wrangler dev --persist-to ../../.wrangler-state",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -24,6 +25,7 @@
     "@cloudflare/workers-types": "^4.20260623.1",
     "@fonts/db": "workspace:*",
     "@fonts/tsconfig": "workspace:*",
+    "@types/bun": "^1.3.14",
     "typescript": "^6.0.3",
     "wrangler": "^4.103.0"
   }

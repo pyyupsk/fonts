@@ -10,13 +10,13 @@ import { subsets } from "@fonts/db/schema/subsets";
 import { variants } from "@fonts/db/schema/variants";
 import type { Bindings } from "../bindings";
 
-const listQuerySchema = z.object({
+export const listQuerySchema = z.object({
   category: z.string().min(1).optional(),
   license: z.string().min(1).optional(),
   search: z.string().min(1).max(100).optional(),
 });
 
-const familyParamSchema = z.object({
+export const familyParamSchema = z.object({
   family: z.string().min(1).max(100),
 });
 

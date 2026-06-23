@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@fonts/tsconfig/base.json",
   "compilerOptions": {
-    "types": ["node"]
+    "types": ["node", "bun"]
   },
   "include": ["src", "drizzle.config.ts"]
 }
