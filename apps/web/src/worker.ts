@@ -21,7 +21,7 @@ export default {
     ].join("; ");
 
     const rewritten = new HTMLRewriter()
-      .on("script[type='application/ld+json']", {
+      .on("script", {
         element(el) {
           el.setAttribute("nonce", nonce);
         },
