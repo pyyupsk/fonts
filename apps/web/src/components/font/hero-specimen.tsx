@@ -19,8 +19,12 @@ function pickRandom(
 }
 
 export function HeroSpecimen({ entries }: Readonly<HeroSpecimenProps>) {
-  const [entry, setEntry] = useState(() => pickRandom(entries));
+  const [entry, setEntry] = useState<HeroSpecimenEntry>();
   const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setEntry(pickRandom(entries));
+  }, [entries]);
 
   useEffect(() => {
     if (!entry) return;
