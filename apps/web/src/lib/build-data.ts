@@ -1,8 +1,17 @@
 import { hc } from "hono/client";
 import type { AppType } from "@fonts/api";
+import { safe } from "./safe";
 
 const API_BASE = import.meta.env.API_BASE;
 const client = hc<AppType>(API_BASE).api.fonts;
+
+const DEFAULT_TIMEOUT_MS = 8000;
+
+function fetchWithTimeout(ms: number = DEFAULT_TIMEOUT_MS): { signal: AbortSignal; cancel: () => void } {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new Error(`Request timed out after ${ms}ms`)), ms);
+  return { signal: controller.signal, cancel: () => clearTimeout(timer) };
+}
 
 export interface FamilySummary {
   id: string;
@@ -39,8 +48,28 @@ export interface FamilyDetail {
 
 let fullCache: Promise<FamilyDetail[]> | undefined;
 
+async function fetchAllFamilyDetailsList(): Promise<FamilyDetail[]> {
+  const { signal, cancel } = fetchWithTimeout();
+
+  const [response, fetchError] = await safe(client.full.$get(undefined, { init: { signal } }));
+  cancel();
+  if (fetchError) {
+    throw new Error(`Failed to fetch font families from ${API_BASE}: ${fetchError.message}`);
+  }
+  if (!response.ok) {
+    throw new Error(`Failed to fetch font families from ${API_BASE}: ${response.status} ${response.statusText}`);
+  }
+
+  const [body, parseError] = await safe(response.json());
+  if (parseError) {
+    throw new Error(`Failed to parse font families response from ${API_BASE}: ${parseError.message}`);
+  }
+
+  return body.families;
+}
+
 function getAllFamilyDetailsList(): Promise<FamilyDetail[]> {
-  fullCache ??= client.full.$get().then(async (response) => (await response.json()).families);
+  fullCache ??= fetchAllFamilyDetailsList();
   return fullCache;
 }
 
