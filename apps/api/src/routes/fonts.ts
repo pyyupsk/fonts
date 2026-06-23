@@ -8,12 +8,12 @@ import { familySubsets } from "@fonts/db/schema/family-subsets";
 import { files } from "@fonts/db/schema/files";
 import { subsets } from "@fonts/db/schema/subsets";
 import { variants } from "@fonts/db/schema/variants";
-import type { Bindings } from "../bindings";
+import type { Bindings } from "@/bindings";
 import {
   groupSubsetsByFamily,
   groupVariantsByFamily,
   toVariantWithFileUrl,
-} from "../lib/fonts-transform";
+} from "@/lib/fonts-transform";
 
 export const listQuerySchema = z.object({
   category: z.string().min(1).optional(),

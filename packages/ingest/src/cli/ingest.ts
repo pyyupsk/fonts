@@ -2,14 +2,14 @@ import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { defineCommand, runMain } from "citty";
 import pLimit from "p-limit";
-import { loadFamilyRows } from "../parse/ingest-family";
+import { loadFamilyRows } from "@/parse/ingest-family";
 import {
   buildFamilyStatements,
   buildFileStatements,
   buildSeedLicensesStatements,
-} from "../sql/build-statements";
-import { convertFamilyFiles } from "../upload/convert-and-upload";
-import { createR2Client } from "../upload/credentials";
+} from "@/sql/build-statements";
+import { convertFamilyFiles } from "@/upload/convert-and-upload";
+import { createR2Client } from "@/upload/credentials";
 
 const OUT_DIR = join(import.meta.dirname, "../../.out");
 const FONTS_DATA_ROOT = join(import.meta.dirname, "../../../fonts");

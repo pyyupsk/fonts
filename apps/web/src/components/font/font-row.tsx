@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { loadFont } from "../../lib/load-font";
-import { Skeleton } from "../ui/skeleton";
+import { loadFont } from "@/lib/load-font";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface FontRowProps {
   familyId: string;

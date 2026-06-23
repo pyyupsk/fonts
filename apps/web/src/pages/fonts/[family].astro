@@ -1,15 +1,15 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import { BackLink } from "../../components/nav/back-link";
-import { EmbedSnippet } from "../../components/font/embed-snippet";
-import { FontSpecimenList } from "../../components/font/font-specimen-list";
-import { buildEmbedSnippet } from "../../lib/build-embed-snippet";
-import { getAllFamilies, getAllFamilyDetails } from "../../lib/build-data";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { BackLink } from "@/components/nav/back-link";
+import { EmbedSnippet } from "@/components/font/embed-snippet";
+import { FontSpecimenList } from "@/components/font/font-specimen-list";
+import { buildEmbedSnippet } from "@/lib/build-embed-snippet";
+import { getAllFamilies, getAllFamilyDetails } from "@/lib/build-data";
 import {
   previewFontFamilyName,
   variableFontFamilyName,
-} from "../../lib/font-family-name";
-import { highlightCss } from "../../lib/highlight-css";
+} from "@/lib/font-family-name";
+import { highlightCss } from "@/lib/highlight-css";
 
 export async function getStaticPaths() {
   const families = await getAllFamilies();

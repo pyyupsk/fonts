@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FontPreview } from "./font-preview";
-import { Textarea } from "../ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 import { VariableFontSpecimen } from "./variable-font-specimen";
 
 const DEFAULT_TEXT = `Everyone has the right to freedom of thought, conscience and religion; this right includes freedom to change his religion or belief, and freedom, either alone or in community with others and in public or private, to manifest his religion or belief in teaching, practice, worship and observance.

@@ -5,8 +5,8 @@ import { files } from "@fonts/db/schema/files";
 import { licenses } from "@fonts/db/schema/licenses";
 import { subsets } from "@fonts/db/schema/subsets";
 import { variants } from "@fonts/db/schema/variants";
-import type { ConvertedFile } from "../upload/convert-and-upload";
-import type { FamilyRow, SubsetRow, VariantRow } from "../parse/map-to-rows";
+import type { ConvertedFile } from "@/upload/convert-and-upload";
+import type { FamilyRow, SubsetRow, VariantRow } from "@/parse/map-to-rows";
 
 type FakeD1Client = Parameters<typeof drizzle>[0];
 

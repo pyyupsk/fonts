@@ -2,7 +2,10 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": ["@fonts/tsconfig/base.json", "astro/tsconfigs/strict"],
   "compilerOptions": {
-    "types": ["bun"]
+    "types": ["bun"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]

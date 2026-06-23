@@ -1,5 +1,5 @@
-import { previewFontFamilyName } from "../../lib/font-family-name";
-import { useFontLoaded } from "../../hooks/useFontLoaded";
+import { previewFontFamilyName } from "@/lib/font-family-name";
+import { useFontLoaded } from "@/hooks/useFontLoaded";
 import { SpecimenSkeleton } from "./specimen-skeleton";
 
 interface FontPreviewProps {

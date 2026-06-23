@@ -1,4 +1,4 @@
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const SKELETON_PARAGRAPHS = [
   ["p1-a:100%", "p1-b:100%", "p1-c:100%", "p1-d:55%"],

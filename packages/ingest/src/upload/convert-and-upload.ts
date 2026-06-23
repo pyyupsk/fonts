@@ -3,8 +3,8 @@ import { copyFile, mkdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { PutObjectCommand, type S3Client } from "@aws-sdk/client-s3";
 import { $ } from "bun";
-import { mapFamily, slugify } from "../parse/map-to-rows";
-import { parseMetadata } from "../parse/parse-metadata";
+import { mapFamily, slugify } from "@/parse/map-to-rows";
+import { parseMetadata } from "@/parse/parse-metadata";
 import { fetchExistingChecksums } from "./d1-client";
 
 const FONTS_DATA_ROOT = join(import.meta.dirname, "../../../fonts");
