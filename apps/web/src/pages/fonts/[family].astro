@@ -122,8 +122,26 @@ const embedSnippets = await Promise.all(
       detail.family.license
     }
   </p>
-  <p class="text-label text-paper-muted mb-lg">
+  <p class="text-label text-paper-muted mb-xs">
     Subsets: {detail.subsets.map((subset) => subset.name).join(", ")}
+  </p>
+  <p class="flex flex-wrap gap-x-md gap-y-2xs text-label mb-lg">
+    <a
+      class="text-paper-muted underline transition-colors duration-fast ease-out-quart hover:text-accent"
+      href={detail.family.sourceRepositoryUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Source ↗
+    </a>
+    <a
+      class="text-paper-muted underline transition-colors duration-fast ease-out-quart hover:text-accent"
+      href={detail.family.licenseUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {detail.family.license} license ↗
+    </a>
   </p>
 
   <FontSpecimenList

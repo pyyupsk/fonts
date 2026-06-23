@@ -28,6 +28,7 @@ export interface FamilySummary {
   isNoto: boolean;
   dateAdded: string;
   sourceRepositoryUrl: string;
+  licenseUrl: string;
   wghtMin: number | null;
   wghtMax: number | null;
 }

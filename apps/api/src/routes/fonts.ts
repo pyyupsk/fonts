@@ -1,11 +1,12 @@
 import { zValidator } from "@hono/zod-validator";
 import { drizzle } from "drizzle-orm/d1";
-import { and, eq, like } from "drizzle-orm";
+import { and, eq, getTableColumns, like } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { families } from "@fonts/db/schema/families";
 import { familySubsets } from "@fonts/db/schema/family-subsets";
 import { files } from "@fonts/db/schema/files";
+import { licenses } from "@fonts/db/schema/licenses";
 import { subsets } from "@fonts/db/schema/subsets";
 import { variants } from "@fonts/db/schema/variants";
 import type { Bindings } from "@/bindings";
@@ -47,7 +48,10 @@ export const fontsRoute = new Hono<{ Bindings: Bindings }>()
     const db = drizzle(c.env.DB);
 
     const [familyRows, variantRows, subsetRows] = await Promise.all([
-      db.select().from(families),
+      db
+        .select({ ...getTableColumns(families), licenseUrl: licenses.url })
+        .from(families)
+        .innerJoin(licenses, eq(licenses.id, families.license)),
       db
         .select({
           id: variants.id,
@@ -88,7 +92,11 @@ export const fontsRoute = new Hono<{ Bindings: Bindings }>()
     const { family: familyId } = c.req.valid("param");
 
     const [[family], familyVariants, familySubsetRows] = await Promise.all([
-      db.select().from(families).where(eq(families.id, familyId)),
+      db
+        .select({ ...getTableColumns(families), licenseUrl: licenses.url })
+        .from(families)
+        .innerJoin(licenses, eq(licenses.id, families.license))
+        .where(eq(families.id, familyId)),
       db
         .select({
           id: variants.id,
