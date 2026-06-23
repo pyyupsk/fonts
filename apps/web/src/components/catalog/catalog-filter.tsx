@@ -3,7 +3,7 @@ import { FontRow } from "../font/font-row";
 import { Input } from "../ui/input";
 import { Select } from "../ui/select";
 
-const BATCH_SIZE = 60;
+const BATCH_SIZE = 10;
 const ALL = "all";
 
 export interface CatalogEntry {
@@ -237,7 +237,7 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
         </div>
       ) : (
         <div className="border-t border-ink-border" role="list">
-          {visible.map((entry) => (
+          {visible.map((entry, index) => (
             <FontRow
               key={entry.id}
               familyId={entry.id}
@@ -246,6 +246,7 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
               designer={entry.designer}
               category={entry.category}
               license={entry.license}
+              index={index}
             />
           ))}
         </div>

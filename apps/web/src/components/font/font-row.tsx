@@ -8,7 +8,11 @@ interface FontRowProps {
   designer: string;
   category: string;
   license: string;
+  index: number;
 }
+
+const STAGGER_STEP_MS = 60;
+const STAGGER_SLOTS = 10;
 
 export function FontRow({
   familyId,
@@ -17,6 +21,7 @@ export function FontRow({
   designer,
   category,
   license,
+  index,
 }: Readonly<FontRowProps>) {
   const rowRef = useRef<HTMLAnchorElement>(null);
   const [loaded, setLoaded] = useState(false);
@@ -49,13 +54,20 @@ export function FontRow({
 
   return (
     <a
-      className="flex flex-wrap items-baseline justify-between gap-sm gap-x-lg py-md border-b border-ink-border text-paper no-underline transition-colors duration-fast ease-out-quart hover:text-accent focus-visible:text-accent"
+      className="flex flex-wrap items-baseline justify-between gap-sm gap-x-lg py-md border-b border-ink-border text-paper no-underline transition-[opacity,transform,color] duration-normal ease-out-quart hover:text-accent focus-visible:text-accent"
       href={`/fonts/${familyId}/`}
       ref={rowRef}
+      style={{
+        opacity: loaded ? 1 : 0,
+        transform: loaded ? "none" : "translateY(0.5rem)",
+        transitionDelay: loaded
+          ? `${(index % STAGGER_SLOTS) * STAGGER_STEP_MS}ms`
+          : "0ms",
+      }}
     >
       <span
         className="text-row font-normal leading-[1.1]"
-        style={{ fontFamily: loaded ? fontFamilyName : "var(--font-display)" }}
+        style={{ fontFamily: fontFamilyName }}
       >
         {name}
       </span>
