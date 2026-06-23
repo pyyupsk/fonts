@@ -5,6 +5,10 @@ import { EmbedSnippet } from "../../components/font/embed-snippet";
 import { FontSpecimenList } from "../../components/font/font-specimen-list";
 import { buildEmbedSnippet } from "../../lib/build-embed-snippet";
 import { getAllFamilies, getAllFamilyDetails } from "../../lib/build-data";
+import {
+  previewFontFamilyName,
+  variableFontFamilyName,
+} from "../../lib/font-family-name";
 import { highlightCss } from "../../lib/highlight-css";
 
 export async function getStaticPaths() {
@@ -32,6 +36,42 @@ const jsonLd = {
   genre: detail.family.category,
 };
 
+const isVariableFamily =
+  detail.family.wghtMin !== null &&
+  detail.family.wghtMax !== null &&
+  detail.family.wghtMin < detail.family.wghtMax;
+
+const previewFontFaces = isVariableFamily
+  ? [...new Set(detail.variants.map((variant) => variant.style))].map(
+      (style) => {
+        const variant = detail.variants.find((entry) => entry.style === style)!;
+        return {
+          fontFamily: variableFontFamilyName(detail.family.id, style),
+          fileUrl: variant.fileUrl,
+          style,
+          fontWeight: `${detail.family.wghtMin} ${detail.family.wghtMax}`,
+        };
+      },
+    )
+  : detail.variants.map((variant) => ({
+      fontFamily: previewFontFamilyName(detail.family.id, variant.id),
+      fileUrl: variant.fileUrl,
+      style: variant.style,
+      fontWeight: variant.weight.toString(),
+    }));
+
+const previewFontFaceCss = previewFontFaces
+  .map(
+    (face) => `@font-face {
+  font-family: "${face.fontFamily}";
+  src: url("${face.fileUrl}") format("woff2");
+  font-weight: ${face.fontWeight};
+  font-style: ${face.style};
+  font-display: block;
+}`,
+  )
+  .join("\n");
+
 const embedSnippets = await Promise.all(
   detail.variants.map(async (variant) => {
     const code = buildEmbedSnippet({
@@ -52,6 +92,20 @@ const embedSnippets = await Promise.all(
 ---
 
 <BaseLayout title={`${detail.family.name} — Fonts`} description={description}>
+  <Fragment slot="head">
+    {
+      previewFontFaces.map((face) => (
+        <link
+          rel="preload"
+          as="font"
+          type="font/woff2"
+          href={face.fileUrl}
+          crossorigin="anonymous"
+        />
+      ))
+    }
+    <style set:html={previewFontFaceCss}></style>
+  </Fragment>
   <script
     type="application/ld+json"
     is:inline

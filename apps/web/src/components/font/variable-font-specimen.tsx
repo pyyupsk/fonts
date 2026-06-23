@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { loadFont } from "../../lib/load-font";
+import { useMemo, useState } from "react";
+import { variableFontFamilyName } from "../../lib/font-family-name";
 
 const WEIGHT_STOPS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
 
@@ -38,26 +38,7 @@ export function VariableFontSpecimen({
   const [selectedWeight, setSelectedWeight] = useState(
     weightStops.includes(400) ? 400 : (weightStops[0] ?? wghtMin),
   );
-  const [loadedStyle, setLoadedStyle] = useState<string | null>(null);
-
-  const fontFamilyName = `variable-${familyId}-${selectedStyle}`;
-
-  useEffect(() => {
-    const variant = variants.find((entry) => entry.style === selectedStyle);
-    if (!variant) return;
-
-    let isCurrent = true;
-    loadFont(fontFamilyName, variant.fileUrl, {
-      style: selectedStyle,
-      weight: `${wghtMin} ${wghtMax}`,
-    }).then((ok) => {
-      if (!isCurrent || !ok) return;
-      setLoadedStyle(selectedStyle);
-    });
-    return () => {
-      isCurrent = false;
-    };
-  }, [variants, selectedStyle, wghtMin, wghtMax, fontFamilyName]);
+  const fontFamilyName = variableFontFamilyName(familyId, selectedStyle);
 
   return (
     <div className="py-lg border-b border-ink-border">
@@ -100,8 +81,7 @@ export function VariableFontSpecimen({
       <pre
         className="text-[clamp(1.5rem,3vw,2.5rem)] leading-tight text-wrap"
         style={{
-          fontFamily:
-            loadedStyle === selectedStyle ? fontFamilyName : "var(--font-sans)",
+          fontFamily: `"${fontFamilyName}", var(--font-sans)`,
           fontStyle: selectedStyle === "italic" ? "italic" : "normal",
           fontWeight: selectedWeight,
         }}

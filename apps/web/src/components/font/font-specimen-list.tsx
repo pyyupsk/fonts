@@ -63,7 +63,6 @@ export function FontSpecimenList({
               key={variant.id}
               familyId={familyId}
               variantId={variant.id}
-              fileUrl={variant.fileUrl}
               style={variant.style}
               weight={variant.weight}
               text={text || DEFAULT_TEXT}
