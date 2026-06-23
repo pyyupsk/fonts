@@ -16,10 +16,22 @@
     "format:check": "prettier --check .",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
+    "prepare": "nit install",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck"
   },
+  "nit": {
+    "hooks": {
+      "pre-commit": {
+        "stages": {
+          "**/*.{ts,tsx,js,mjs,cjs,astro}": "bunx eslint {staged_files}",
+          "**/*.{ts,tsx,js,mjs,cjs,jsx,astro,json,jsonc,css,md}": "bunx prettier --check {staged_files}"
+        }
+      }
+    }
+  },
   "devDependencies": {
+    "@pyyupsk/nit": "^0.3.0",
     "astro-eslint-parser": "^2.0.0",
     "eslint": "^10.5.0",
     "eslint-config-prettier": "^10.1.8",
