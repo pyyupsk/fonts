@@ -23,7 +23,10 @@ export function FontPreview({
 
   useEffect(() => {
     let isCurrent = true;
-    loadFont(fontFamilyName, fileUrl, { style, weight: weight.toString() }).then((ok) => {
+    loadFont(fontFamilyName, fileUrl, {
+      style,
+      weight: weight.toString(),
+    }).then((ok) => {
       if (!isCurrent || !ok) return;
       setLoaded(true);
     });

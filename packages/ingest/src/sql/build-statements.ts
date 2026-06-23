@@ -14,7 +14,7 @@ const db = drizzle({} as unknown as FakeD1Client);
 
 function toInlinedSql(query: { sql: string; params: unknown[] }): string {
   let paramIndex = 0;
-  const inlined = query.sql.replaceAll('?', () => {
+  const inlined = query.sql.replaceAll("?", () => {
     const param = query.params[paramIndex];
     paramIndex += 1;
     if (param === null || param === undefined) return "NULL";
@@ -27,14 +27,32 @@ function toInlinedSql(query: { sql: string; params: unknown[] }): string {
 
 export function buildSeedLicensesStatements(): string[] {
   const rows = [
-    { id: "ofl", name: "SIL Open Font License", url: "https://scripts.sil.org/OFL" },
-    { id: "apache", name: "Apache License 2.0", url: "https://www.apache.org/licenses/LICENSE-2.0" },
-    { id: "ufl", name: "Ubuntu Font License", url: "https://ubuntu.com/legal/font-licence" },
+    {
+      id: "ofl",
+      name: "SIL Open Font License",
+      url: "https://scripts.sil.org/OFL",
+    },
+    {
+      id: "apache",
+      name: "Apache License 2.0",
+      url: "https://www.apache.org/licenses/LICENSE-2.0",
+    },
+    {
+      id: "ufl",
+      name: "Ubuntu Font License",
+      url: "https://ubuntu.com/legal/font-licence",
+    },
   ];
-  return rows.map((row) => toInlinedSql(db.insert(licenses).values(row).onConflictDoNothing().toSQL()));
+  return rows.map((row) =>
+    toInlinedSql(db.insert(licenses).values(row).onConflictDoNothing().toSQL()),
+  );
 }
 
-export function buildFamilyStatements(family: FamilyRow, variantRows: VariantRow[], subsetRows: SubsetRow[]): string[] {
+export function buildFamilyStatements(
+  family: FamilyRow,
+  variantRows: VariantRow[],
+  subsetRows: SubsetRow[],
+): string[] {
   const statements: string[] = [];
 
   statements.push(
@@ -62,7 +80,9 @@ export function buildFamilyStatements(family: FamilyRow, variantRows: VariantRow
 
   for (const subset of subsetRows) {
     statements.push(
-      toInlinedSql(db.insert(subsets).values(subset).onConflictDoNothing().toSQL()),
+      toInlinedSql(
+        db.insert(subsets).values(subset).onConflictDoNothing().toSQL(),
+      ),
       toInlinedSql(
         db
           .insert(familySubsets)
@@ -81,7 +101,11 @@ export function buildFamilyStatements(family: FamilyRow, variantRows: VariantRow
           .values(variant)
           .onConflictDoUpdate({
             target: variants.id,
-            set: { style: variant.style, weight: variant.weight, postScriptName: variant.postScriptName },
+            set: {
+              style: variant.style,
+              weight: variant.weight,
+              postScriptName: variant.postScriptName,
+            },
           })
           .toSQL(),
       ),

@@ -12,7 +12,10 @@ export interface FamilyRows {
   subsets: SubsetRow[];
 }
 
-export async function loadFamilyRows(license: "ofl" | "apache" | "ufl", familyDir: string): Promise<FamilyRows> {
+export async function loadFamilyRows(
+  license: "ofl" | "apache" | "ufl",
+  familyDir: string,
+): Promise<FamilyRows> {
   const metadataPath = join(FONTS_DATA_ROOT, license, familyDir, "METADATA.pb");
   const raw = await readFile(metadataPath, "utf-8");
   const metadata = parseMetadata(raw);

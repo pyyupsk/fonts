@@ -16,7 +16,10 @@ export async function queryD1<T>(sql: string, params: unknown[]): Promise<T[]> {
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${DATABASE_ID}/query`,
     {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ sql, params }),
     },
   );
@@ -27,13 +30,20 @@ export async function queryD1<T>(sql: string, params: unknown[]): Promise<T[]> {
   return json.result[0]?.results ?? [];
 }
 
-export async function fetchExistingChecksums(variantIds: string[]): Promise<Map<string, string>> {
+export async function fetchExistingChecksums(
+  variantIds: string[],
+): Promise<Map<string, string>> {
   if (variantIds.length === 0) return new Map();
 
   const placeholders = variantIds.map(() => "?").join(",");
-  const rows = await queryD1<{ variant_id: string; source_checksum_sha256: string }>(
+  const rows = await queryD1<{
+    variant_id: string;
+    source_checksum_sha256: string;
+  }>(
     `SELECT variant_id, source_checksum_sha256 FROM files WHERE variant_id IN (${placeholders})`,
     variantIds,
   );
-  return new Map(rows.map((row) => [row.variant_id, row.source_checksum_sha256]));
+  return new Map(
+    rows.map((row) => [row.variant_id, row.source_checksum_sha256]),
+  );
 }

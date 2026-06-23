@@ -35,7 +35,9 @@ export async function convertFamilyFiles(
 
   const converted: ConvertedFile[] = [];
 
-  const variantIds = metadata.fonts.map((font) => `${family.id}-${font.weight}-${font.style}`);
+  const variantIds = metadata.fonts.map(
+    (font) => `${family.id}-${font.weight}-${font.style}`,
+  );
   const existingChecksums = await fetchExistingChecksums(variantIds);
 
   for (const font of metadata.fonts) {
@@ -43,7 +45,9 @@ export async function convertFamilyFiles(
     const variantId = `${family.id}-${font.weight}-${font.style}`;
 
     const sourceBuffer = await readFile(srcPath);
-    const sourceChecksumSha256 = createHash("sha256").update(sourceBuffer).digest("hex");
+    const sourceChecksumSha256 = createHash("sha256")
+      .update(sourceBuffer)
+      .digest("hex");
 
     if (existingChecksums.get(variantId) === sourceChecksumSha256) {
       console.log(`  skip (unchanged): ${variantId}`);
@@ -57,7 +61,9 @@ export async function convertFamilyFiles(
 
     const woff2Path = ttfCopyPath.replace(/\.ttf$/, ".woff2");
     const fileBuffer = await readFile(woff2Path);
-    const checksumSha256 = createHash("sha256").update(fileBuffer).digest("hex");
+    const checksumSha256 = createHash("sha256")
+      .update(fileBuffer)
+      .digest("hex");
     const r2Key = `fonts/${license}/${family.id}/${slugify(family.id)}-${font.weight}-${font.style}.woff2`;
 
     await s3Client.send(

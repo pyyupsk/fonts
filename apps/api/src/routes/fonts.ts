@@ -55,7 +55,11 @@ export const fontsRoute = new Hono<{ Bindings: Bindings }>()
         .from(variants)
         .innerJoin(files, eq(files.variantId, variants.id)),
       db
-        .select({ familyId: familySubsets.familyId, id: subsets.id, name: subsets.name })
+        .select({
+          familyId: familySubsets.familyId,
+          id: subsets.id,
+          name: subsets.name,
+        })
         .from(familySubsets)
         .innerJoin(subsets, eq(subsets.id, familySubsets.subsetId)),
     ]);

@@ -41,7 +41,10 @@ const LICENSE_MAP: Record<string, string> = {
 };
 
 export function slugify(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 export function mapFamily(metadata: ParsedMetadata): FamilyRow {
@@ -61,7 +64,10 @@ export function mapFamily(metadata: ParsedMetadata): FamilyRow {
   };
 }
 
-export function mapVariants(metadata: ParsedMetadata, familyId: string): VariantRow[] {
+export function mapVariants(
+  metadata: ParsedMetadata,
+  familyId: string,
+): VariantRow[] {
   return metadata.fonts.map((font) => ({
     id: `${familyId}-${font.weight}-${font.style}`,
     familyId,

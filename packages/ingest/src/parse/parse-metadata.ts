@@ -74,13 +74,18 @@ export function parseMetadata(text: string): ParsedMetadata {
       if (key === "style") currentFont.style = unquote(value);
       if (key === "weight") currentFont.weight = Number(value.trim());
       if (key === "filename") currentFont.filename = unquote(value);
-      if (key === "post_script_name") currentFont.postScriptName = unquote(value);
+      if (key === "post_script_name")
+        currentFont.postScriptName = unquote(value);
       continue;
     }
 
     if (currentAxis) {
       if (line === "}") {
-        if (currentAxis.tag && currentAxis.minValue !== undefined && currentAxis.maxValue !== undefined) {
+        if (
+          currentAxis.tag &&
+          currentAxis.minValue !== undefined &&
+          currentAxis.maxValue !== undefined
+        ) {
           result.axes.push({
             tag: currentAxis.tag,
             minValue: currentAxis.minValue,

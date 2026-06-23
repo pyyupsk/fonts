@@ -7,9 +7,15 @@ const client = hc<AppType>(API_BASE).api.fonts;
 
 const DEFAULT_TIMEOUT_MS = 8000;
 
-function fetchWithTimeout(ms: number = DEFAULT_TIMEOUT_MS): { signal: AbortSignal; cancel: () => void } {
+function fetchWithTimeout(ms: number = DEFAULT_TIMEOUT_MS): {
+  signal: AbortSignal;
+  cancel: () => void;
+} {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(new Error(`Request timed out after ${ms}ms`)), ms);
+  const timer = setTimeout(
+    () => controller.abort(new Error(`Request timed out after ${ms}ms`)),
+    ms,
+  );
   return { signal: controller.signal, cancel: () => clearTimeout(timer) };
 }
 
@@ -51,18 +57,26 @@ let fullCache: Promise<FamilyDetail[]> | undefined;
 async function fetchAllFamilyDetailsList(): Promise<FamilyDetail[]> {
   const { signal, cancel } = fetchWithTimeout();
 
-  const [response, fetchError] = await safe(client.full.$get(undefined, { init: { signal } }));
+  const [response, fetchError] = await safe(
+    client.full.$get(undefined, { init: { signal } }),
+  );
   cancel();
   if (fetchError) {
-    throw new Error(`Failed to fetch font families from ${API_BASE}: ${fetchError.message}`);
+    throw new Error(
+      `Failed to fetch font families from ${API_BASE}: ${fetchError.message}`,
+    );
   }
   if (!response.ok) {
-    throw new Error(`Failed to fetch font families from ${API_BASE}: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to fetch font families from ${API_BASE}: ${response.status} ${response.statusText}`,
+    );
   }
 
   const [body, parseError] = await safe(response.json());
   if (parseError) {
-    throw new Error(`Failed to parse font families response from ${API_BASE}: ${parseError.message}`);
+    throw new Error(
+      `Failed to parse font families response from ${API_BASE}: ${parseError.message}`,
+    );
   }
 
   return body.families;
@@ -78,7 +92,9 @@ export async function getAllFamilies(): Promise<FamilySummary[]> {
   return details.map((detail) => detail.family);
 }
 
-export async function getAllFamilyDetails(): Promise<Map<string, FamilyDetail>> {
+export async function getAllFamilyDetails(): Promise<
+  Map<string, FamilyDetail>
+> {
   const details = await getAllFamilyDetailsList();
   return new Map(details.map((detail) => [detail.family.id, detail]));
 }

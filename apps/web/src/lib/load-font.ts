@@ -4,7 +4,10 @@ const LOAD_TIMEOUT_MS = 5000;
 
 function timeout(ms: number): Promise<never> {
   return new Promise((_, reject) => {
-    setTimeout(() => reject(new Error(`Font load timed out after ${ms}ms`)), ms);
+    setTimeout(
+      () => reject(new Error(`Font load timed out after ${ms}ms`)),
+      ms,
+    );
   });
 }
 

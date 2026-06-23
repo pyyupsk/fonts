@@ -7,7 +7,14 @@ export interface EmbedSnippetInput {
   wghtMax: number | null;
 }
 
-export function buildEmbedSnippet({ familyName, fileUrl, weight, style, wghtMin, wghtMax }: EmbedSnippetInput): string {
+export function buildEmbedSnippet({
+  familyName,
+  fileUrl,
+  weight,
+  style,
+  wghtMin,
+  wghtMax,
+}: EmbedSnippetInput): string {
   const isVariable = wghtMin !== null && wghtMax !== null && wghtMin < wghtMax;
   const fontWeight = isVariable ? `${wghtMin} ${wghtMax}` : weight.toString();
 

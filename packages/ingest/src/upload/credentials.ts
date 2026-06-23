@@ -7,7 +7,9 @@ const ENDPOINT_SCHEMA = z.url().trim();
 function readEnvVar<T>(name: string, schema: z.ZodType<T>): T {
   const result = schema.safeParse(process.env[name]);
   if (!result.success) {
-    throw new Error(`missing or invalid env var ${name}: ${result.error.message}`);
+    throw new Error(
+      `missing or invalid env var ${name}: ${result.error.message}`,
+    );
   }
   return result.data;
 }

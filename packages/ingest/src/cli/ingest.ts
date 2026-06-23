@@ -3,7 +3,11 @@ import { join } from "node:path";
 import { defineCommand, runMain } from "citty";
 import pLimit from "p-limit";
 import { loadFamilyRows } from "../parse/ingest-family";
-import { buildFamilyStatements, buildFileStatements, buildSeedLicensesStatements } from "../sql/build-statements";
+import {
+  buildFamilyStatements,
+  buildFileStatements,
+  buildSeedLicensesStatements,
+} from "../sql/build-statements";
 import { convertFamilyFiles } from "../upload/convert-and-upload";
 import { createR2Client } from "../upload/credentials";
 
@@ -20,7 +24,9 @@ interface FamilyTarget {
 async function listFamilyTargets(): Promise<FamilyTarget[]> {
   const targets: FamilyTarget[] = [];
   for (const license of LICENSES) {
-    const entries = await readdir(join(FONTS_DATA_ROOT, license), { withFileTypes: true });
+    const entries = await readdir(join(FONTS_DATA_ROOT, license), {
+      withFileTypes: true,
+    });
     for (const entry of entries) {
       if (entry.isDirectory()) {
         targets.push({ license, familyDir: entry.name });
@@ -35,7 +41,9 @@ async function ingestAll(limit: number | undefined) {
 
   const allTargets = await listFamilyTargets();
   const targets = limit ? allTargets.slice(0, limit) : allTargets;
-  console.log(`found ${allTargets.length} families, processing ${targets.length}`);
+  console.log(
+    `found ${allTargets.length} families, processing ${targets.length}`,
+  );
 
   const statements: string[] = buildSeedLicensesStatements();
   const failures: { familyDir: string; error: string }[] = [];
@@ -47,22 +55,39 @@ async function ingestAll(limit: number | undefined) {
     targets.map(({ license, familyDir }) =>
       limitConcurrency(async () => {
         try {
-          const { family, variants, subsets } = await loadFamilyRows(license, familyDir);
-          const converted = await convertFamilyFiles(license, familyDir, s3Client);
-          statements.push(...buildFamilyStatements(family, variants, subsets), ...buildFileStatements(converted));
+          const { family, variants, subsets } = await loadFamilyRows(
+            license,
+            familyDir,
+          );
+          const converted = await convertFamilyFiles(
+            license,
+            familyDir,
+            s3Client,
+          );
+          statements.push(
+            ...buildFamilyStatements(family, variants, subsets),
+            ...buildFileStatements(converted),
+          );
         } catch (error) {
-          failures.push({ familyDir, error: error instanceof Error ? error.message : String(error) });
+          failures.push({
+            familyDir,
+            error: error instanceof Error ? error.message : String(error),
+          });
         } finally {
           completed += 1;
           if (completed % 50 === 0) {
-            console.log(`${completed}/${targets.length} families processed (${failures.length} failed)`);
+            console.log(
+              `${completed}/${targets.length} families processed (${failures.length} failed)`,
+            );
           }
         }
       }),
     ),
   );
 
-  console.log(`done: ${completed - failures.length} succeeded, ${failures.length} failed`);
+  console.log(
+    `done: ${completed - failures.length} succeeded, ${failures.length} failed`,
+  );
   for (const failure of failures) {
     console.log(`  failed: ${failure.familyDir} — ${failure.error}`);
   }
@@ -73,10 +98,16 @@ async function ingestAll(limit: number | undefined) {
   console.log(outPath);
 }
 
-async function ingestOne(license: (typeof LICENSES)[number], familyDir: string) {
+async function ingestOne(
+  license: (typeof LICENSES)[number],
+  familyDir: string,
+) {
   const s3Client = createR2Client();
 
-  const { family, variants, subsets } = await loadFamilyRows(license, familyDir);
+  const { family, variants, subsets } = await loadFamilyRows(
+    license,
+    familyDir,
+  );
   const converted = await convertFamilyFiles(license, familyDir, s3Client);
 
   const statements = [
@@ -96,7 +127,10 @@ function isLicense(value: string): value is (typeof LICENSES)[number] {
 }
 
 const all = defineCommand({
-  meta: { name: "all", description: "ingest every family under packages/fonts" },
+  meta: {
+    name: "all",
+    description: "ingest every family under packages/fonts",
+  },
   args: {
     limit: { type: "string", description: "max families to process" },
   },
@@ -108,8 +142,16 @@ const all = defineCommand({
 const one = defineCommand({
   meta: { name: "one", description: "ingest a single family" },
   args: {
-    license: { type: "positional", required: true, description: "ofl | apache | ufl" },
-    familyDir: { type: "positional", required: true, description: "family directory name" },
+    license: {
+      type: "positional",
+      required: true,
+      description: "ofl | apache | ufl",
+    },
+    familyDir: {
+      type: "positional",
+      required: true,
+      description: "family directory name",
+    },
   },
   async run({ args }) {
     if (!isLicense(args.license)) {
@@ -120,7 +162,10 @@ const one = defineCommand({
 });
 
 const main = defineCommand({
-  meta: { name: "ingest", description: "Ingest Google Fonts family/families into D1 + R2" },
+  meta: {
+    name: "ingest",
+    description: "Ingest Google Fonts family/families into D1 + R2",
+  },
   subCommands: { all, one },
 });
 

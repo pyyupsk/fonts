@@ -1,0 +1,9 @@
+dist
+.astro
+.wrangler
+.wrangler-state
+node_modules
+bun.lock
+
+packages/db/drizzle/meta
+packages/fonts
