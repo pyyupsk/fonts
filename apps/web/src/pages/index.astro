@@ -32,13 +32,24 @@ const catalog: CatalogEntry[] = families.map((family) => {
 <BaseLayout
   title="Fonts — a self-hosted, open-license type catalog"
   description="Browse, compare, and download open-license fonts. Self-hosted webfonts with instant CDN delivery and copy-paste @font-face embeds."
+  footer={false}
 >
   <header class="border-b border-ink-border pt-xl pb-lg mb-lg">
-    <h1
-      class="font-display text-display font-normal leading-[0.95] tracking-[-0.02em] text-balance"
-    >
-      Fonts <span class="text-heading text-paper-muted">by pyyupsk</span>
-    </h1>
+    <div class="flex flex-wrap items-baseline justify-between gap-sm">
+      <h1
+        class="font-display text-display font-normal leading-[0.95] tracking-[-0.02em] text-balance"
+      >
+        Fonts <span class="text-heading text-paper-muted">by pyyupsk</span>
+      </h1>
+      <a
+        class="text-label text-paper-muted underline transition-colors duration-fast ease-out-quart hover:text-accent"
+        href="https://github.com/pyyupsk/fonts"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Source on GitHub ↗
+      </a>
+    </div>
     <p class="max-w-[42ch] text-pretty text-paper-muted text-label mt-sm">
       A self-hosted, open-license type catalog. Browse, compare, and grab the
       file.
