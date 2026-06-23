@@ -14,11 +14,11 @@
   "dependencies": {
     "@hono/zod-validator": "^0.8.0",
     "drizzle-orm": "^0.45.2",
-    "hono": "^4.12.26",
+    "hono": "^4.12.27",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260621.1",
+    "@cloudflare/workers-types": "^4.20260623.1",
     "@fonts/db": "workspace:*",
     "@fonts/tsconfig": "workspace:*",
     "typescript": "^6.0.3",
