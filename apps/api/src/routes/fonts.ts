@@ -9,6 +9,11 @@ import { files } from "@fonts/db/schema/files";
 import { subsets } from "@fonts/db/schema/subsets";
 import { variants } from "@fonts/db/schema/variants";
 import type { Bindings } from "../bindings";
+import {
+  groupSubsetsByFamily,
+  groupVariantsByFamily,
+  toVariantWithFileUrl,
+} from "./fonts-transform";
 
 export const listQuerySchema = z.object({
   category: z.string().min(1).optional(),
@@ -64,29 +69,11 @@ export const fontsRoute = new Hono<{ Bindings: Bindings }>()
         .innerJoin(subsets, eq(subsets.id, familySubsets.subsetId)),
     ]);
 
-    interface VariantWithFileUrl {
-      id: string;
-      familyId: string;
-      style: string;
-      weight: number;
-      postScriptName: string;
-      fileUrl: string;
-    }
-
-    const variantsByFamily = new Map<string, VariantWithFileUrl[]>();
-    for (const { r2Key, ...variant } of variantRows) {
-      const fileUrl = `${c.env.FONTS_PUBLIC_BASE}/${r2Key}`;
-      const list = variantsByFamily.get(variant.familyId) ?? [];
-      list.push({ ...variant, fileUrl });
-      variantsByFamily.set(variant.familyId, list);
-    }
-
-    const subsetsByFamily = new Map<string, { id: string; name: string }[]>();
-    for (const { familyId, id, name } of subsetRows) {
-      const list = subsetsByFamily.get(familyId) ?? [];
-      list.push({ id, name });
-      subsetsByFamily.set(familyId, list);
-    }
+    const variantsByFamily = groupVariantsByFamily(
+      variantRows,
+      c.env.FONTS_PUBLIC_BASE,
+    );
+    const subsetsByFamily = groupSubsetsByFamily(subsetRows);
 
     return c.json({
       families: familyRows.map((family) => ({
@@ -127,10 +114,9 @@ export const fontsRoute = new Hono<{ Bindings: Bindings }>()
 
     return c.json({
       family,
-      variants: familyVariants.map(({ r2Key, ...variant }) => ({
-        ...variant,
-        fileUrl: `${c.env.FONTS_PUBLIC_BASE}/${r2Key}`,
-      })),
+      variants: familyVariants.map((variant) =>
+        toVariantWithFileUrl(variant, c.env.FONTS_PUBLIC_BASE),
+      ),
       subsets: familySubsetRows,
     });
   });
