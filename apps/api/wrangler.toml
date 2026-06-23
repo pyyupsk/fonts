@@ -8,4 +8,4 @@ database_name = "fonts-db"
 database_id = "abeacae9-07fb-4b79-a428-699ac9f31c2f"
 
 [vars]
-FONTS_PUBLIC_BASE = "https://fonts.fasu.dev"
+FONTS_PUBLIC_BASE = "https://cdn.fasu.dev"
