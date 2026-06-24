@@ -8,6 +8,7 @@ interface FontPreviewProps {
   style: string;
   weight: number;
   text: string;
+  size: number;
 }
 
 export function FontPreview({
@@ -16,6 +17,7 @@ export function FontPreview({
   style,
   weight,
   text,
+  size,
 }: Readonly<FontPreviewProps>) {
   const fontFamilyName = previewFontFamilyName(familyId, variantId);
   const loaded = useFontLoaded(fontFamilyName, weight, style);
@@ -32,11 +34,12 @@ export function FontPreview({
           </div>
         )}
         <p
-          className="text-[clamp(1.5rem,3vw,2.5rem)] leading-tight whitespace-pre-line transition-opacity duration-base ease-out-quart"
+          className="leading-tight whitespace-pre-line transition-opacity duration-base ease-out-quart"
           style={{
             fontFamily: `"${fontFamilyName}", var(--font-sans)`,
             fontStyle: style === "italic" ? "italic" : "normal",
             fontWeight: weight,
+            fontSize: size,
             opacity: loaded ? 1 : 0,
           }}
         >

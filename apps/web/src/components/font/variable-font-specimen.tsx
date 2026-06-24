@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
 import { variableFontFamilyName } from "@/lib/font-family-name";
 import { useFontLoaded } from "@/hooks/useFontLoaded";
+import { Slider } from "@/components/ui/slider";
 import { SpecimenSkeleton } from "./specimen-skeleton";
-
-const WEIGHT_STOPS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
 
 interface Variant {
   id: string;
@@ -18,6 +17,7 @@ interface VariableFontSpecimenProps {
   wghtMin: number;
   wghtMax: number;
   text: string;
+  size: number;
 }
 
 export function VariableFontSpecimen({
@@ -26,19 +26,17 @@ export function VariableFontSpecimen({
   wghtMin,
   wghtMax,
   text,
+  size,
 }: Readonly<VariableFontSpecimenProps>) {
   const styles = useMemo(
     () => [...new Set(variants.map((variant) => variant.style))],
     [variants],
   );
-  const weightStops = useMemo(
-    () => WEIGHT_STOPS.filter((stop) => stop >= wghtMin && stop <= wghtMax),
-    [wghtMin, wghtMax],
-  );
+  const hasWeightRange = wghtMin < wghtMax;
 
   const [selectedStyle, setSelectedStyle] = useState(styles[0] ?? "normal");
   const [selectedWeight, setSelectedWeight] = useState(
-    weightStops.includes(400) ? 400 : (weightStops[0] ?? wghtMin),
+    hasWeightRange && wghtMin < 400 && 400 < wghtMax ? 400 : wghtMin,
   );
   const fontFamilyName = variableFontFamilyName(familyId, selectedStyle);
   const loaded = useFontLoaded(fontFamilyName, selectedWeight, selectedStyle);
@@ -47,16 +45,17 @@ export function VariableFontSpecimen({
     <div className="py-lg border-b border-ink-border">
       <div className="flex flex-wrap items-center gap-md mb-sm">
         {styles.length > 1 && (
-          <div className="flex gap-2xs">
+          <div className="inline-flex gap-xs">
             {styles.map((style) => (
               <button
                 key={style}
                 type="button"
+                aria-pressed={selectedStyle === style}
                 onClick={() => setSelectedStyle(style)}
-                className={`rounded-full border px-sm py-2xs text-label transition-colors duration-fast ease-out-quart ${
+                className={`border-b border-dotted text-label transition-colors duration-fast ease-out-quart ${
                   selectedStyle === style
                     ? "border-accent text-accent"
-                    : "border-ink-border text-paper-muted hover:text-paper"
+                    : "border-paper-muted text-paper-muted hover:border-paper hover:text-paper"
                 }`}
               >
                 {style}
@@ -64,22 +63,23 @@ export function VariableFontSpecimen({
             ))}
           </div>
         )}
-        <div className="flex flex-wrap gap-2xs">
-          {weightStops.map((weight) => (
-            <button
-              key={weight}
-              type="button"
-              onClick={() => setSelectedWeight(weight)}
-              className={`rounded-full border px-sm py-2xs text-label transition-colors duration-fast ease-out-quart ${
-                selectedWeight === weight
-                  ? "border-accent text-accent"
-                  : "border-ink-border text-paper-muted hover:text-paper"
-              }`}
-            >
-              {weight}
-            </button>
-          ))}
-        </div>
+        {hasWeightRange ? (
+          <div className="inline-flex items-center gap-xs">
+            <span className="text-label text-paper-muted">weight</span>
+            <Slider
+              ariaLabel="Weight"
+              value={selectedWeight}
+              onValueChange={setSelectedWeight}
+              min={wghtMin}
+              max={wghtMax}
+            />
+            <span className="text-label text-paper-muted">
+              {selectedWeight}
+            </span>
+          </div>
+        ) : (
+          <span className="text-label text-paper-muted">{wghtMin}</span>
+        )}
       </div>
       <div className="relative">
         {!loaded && (
@@ -88,11 +88,12 @@ export function VariableFontSpecimen({
           </div>
         )}
         <pre
-          className="text-[clamp(1.5rem,3vw,2.5rem)] leading-tight text-wrap transition-opacity duration-base ease-out-quart"
+          className="leading-tight text-wrap transition-opacity duration-base ease-out-quart"
           style={{
             fontFamily: `"${fontFamilyName}", var(--font-sans)`,
             fontStyle: selectedStyle === "italic" ? "italic" : "normal",
             fontWeight: selectedWeight,
+            fontSize: size,
             opacity: loaded ? 1 : 0,
           }}
         >
