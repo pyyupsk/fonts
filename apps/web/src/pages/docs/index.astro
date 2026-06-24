@@ -5,8 +5,15 @@ import type { AppType } from "@fonts/api";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { BackLink } from "@/components/nav/back-link";
 import { EmbedTabs } from "@/components/docs/embed-tabs";
+import { ViteFontsTabs } from "@/components/docs/vite-fonts-tabs";
 import { CodeBlock } from "@/components/ui/code-block";
-import { highlightCss, highlightJson, highlightText } from "@/lib/highlighter";
+import { buildViteFontsSnippet } from "@/lib/build-vite-fonts-snippet";
+import {
+  highlightCss,
+  highlightJson,
+  highlightText,
+  highlightTs,
+} from "@/lib/highlighter";
 import { safe } from "@/lib/safe";
 
 const description =
@@ -55,6 +62,23 @@ const variableEmbedExample = `@font-face {
 const [embedHtml, variableEmbedHtml] = await Promise.all([
   highlightCss(embedExample),
   highlightCss(variableEmbedExample),
+]);
+
+const astroFontsExample = buildViteFontsSnippet({
+  familyName: variableFamilyJson.family.name,
+  wghtMin: variableFamilyJson.family.wghtMin,
+  wghtMax: variableFamilyJson.family.wghtMax,
+  target: "astro",
+});
+const viteFontsExample = buildViteFontsSnippet({
+  familyName: variableFamilyJson.family.name,
+  wghtMin: variableFamilyJson.family.wghtMin,
+  wghtMax: variableFamilyJson.family.wghtMax,
+  target: "vite",
+});
+const [astroFontsHtml, viteFontsHtml] = await Promise.all([
+  highlightTs(astroFontsExample),
+  highlightTs(viteFontsExample),
 ]);
 
 const endpoints = [
@@ -147,6 +171,29 @@ const endpointHtml = await Promise.all(
       staticHtml={embedHtml}
       variableCode={variableEmbedExample}
       variableHtml={variableEmbedHtml}
+    />
+  </section>
+
+  <section class="mb-2xl">
+    <h2 class="text-heading font-display font-normal mb-md">
+      Self-hosting with vite-fonts
+    </h2>
+    <p class="text-paper-muted mb-md max-w-prose">
+      <a
+        class="underline transition-colors duration-fast ease-out-quart hover:text-accent"
+        href="https://github.com/pyyupsk/vite-fonts"
+        target="_blank"
+        rel="noopener noreferrer">@pyyupsk/vite-fonts</a
+      > downloads and self-hosts a family at build time on any Vite-based project
+      — Astro has first-class support (shown below). Point <code>source</code> at
+      <code>"pyyupsk"</code> to pull from this catalog.
+    </p>
+    <ViteFontsTabs
+      client:load
+      astroCode={astroFontsExample}
+      astroHtml={astroFontsHtml}
+      viteCode={viteFontsExample}
+      viteHtml={viteFontsHtml}
     />
   </section>
 

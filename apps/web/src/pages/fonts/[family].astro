@@ -2,14 +2,16 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { BackLink } from "@/components/nav/back-link";
 import { CodeBlock } from "@/components/ui/code-block";
+import { ViteFontsTabs } from "@/components/docs/vite-fonts-tabs";
 import { FontSpecimenList } from "@/components/font/font-specimen-list";
 import { buildEmbedSnippet } from "@/lib/build-embed-snippet";
+import { buildViteFontsSnippet } from "@/lib/build-vite-fonts-snippet";
 import { getAllFamilies, getAllFamilyDetails } from "@/lib/build-data";
 import {
   previewFontFamilyName,
   variableFontFamilyName,
 } from "@/lib/font-family-name";
-import { highlightCss } from "@/lib/highlighter";
+import { highlightCss, highlightTs } from "@/lib/highlighter";
 
 export async function getStaticPaths() {
   const families = await getAllFamilies();
@@ -89,6 +91,23 @@ const embedSnippets = await Promise.all(
     };
   }),
 );
+
+const astroFontsCode = buildViteFontsSnippet({
+  familyName: detail.family.name,
+  wghtMin: detail.family.wghtMin,
+  wghtMax: detail.family.wghtMax,
+  target: "astro",
+});
+const viteFontsCode = buildViteFontsSnippet({
+  familyName: detail.family.name,
+  wghtMin: detail.family.wghtMin,
+  wghtMax: detail.family.wghtMax,
+  target: "vite",
+});
+const [astroFontsHtml, viteFontsHtml] = await Promise.all([
+  highlightTs(astroFontsCode),
+  highlightTs(viteFontsCode),
+]);
 ---
 
 <BaseLayout title={`${detail.family.name} — Fonts`} description={description}>
@@ -191,5 +210,26 @@ const embedSnippets = await Promise.all(
         })
       }
     </div>
+  </section>
+
+  <section class="mt-2xl mb-2xl">
+    <h2 class="text-heading font-display font-normal mb-md">
+      Use with vite-fonts
+    </h2>
+    <p class="text-paper-muted mb-sm">
+      Self-host at build time with <a
+        class="underline transition-colors duration-fast ease-out-quart hover:text-accent"
+        href="https://github.com/pyyupsk/vite-fonts"
+        target="_blank"
+        rel="noopener noreferrer">@pyyupsk/vite-fonts</a
+      > — works on any Vite-based project; Astro shown here.
+    </p>
+    <ViteFontsTabs
+      client:load
+      astroCode={astroFontsCode}
+      astroHtml={astroFontsHtml}
+      viteCode={viteFontsCode}
+      viteHtml={viteFontsHtml}
+    />
   </section>
 </BaseLayout>
