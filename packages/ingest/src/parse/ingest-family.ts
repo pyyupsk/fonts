@@ -1,7 +1,14 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { mapFamily, mapSubsets, mapVariants } from "./map-to-rows";
+import {
+  isVariableFamily,
+  mapFamily,
+  mapSubsets,
+  mapVariants,
+  selectFontEntries,
+} from "./map-to-rows";
 import { parseMetadata } from "./parse-metadata";
+import type { ParsedMetadata } from "./parse-metadata";
 import type { FamilyRow, SubsetRow, VariantRow } from "./map-to-rows";
 
 const FONTS_DATA_ROOT = join(import.meta.dirname, "../../../fonts");
@@ -10,6 +17,8 @@ export interface FamilyRows {
   family: FamilyRow;
   variants: VariantRow[];
   subsets: SubsetRow[];
+  fonts: ParsedMetadata["fonts"];
+  variable: boolean;
 }
 
 export async function loadFamilyRows(
@@ -23,6 +32,8 @@ export async function loadFamilyRows(
   const family = mapFamily(metadata);
   const variants = mapVariants(metadata, family.id);
   const subsets = mapSubsets(metadata);
+  const fonts = selectFontEntries(metadata);
+  const variable = isVariableFamily(metadata);
 
-  return { family, variants, subsets };
+  return { family, variants, subsets, fonts, variable };
 }

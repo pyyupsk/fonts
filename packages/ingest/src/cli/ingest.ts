@@ -10,6 +10,8 @@ import {
 } from "@/sql/build-statements";
 import { convertFamilyFiles } from "@/upload/convert-and-upload";
 import { createR2Client } from "@/upload/credentials";
+import { fetchExistingChecksums } from "@/upload/d1-client";
+import type { FamilyRows } from "@/parse/ingest-family";
 
 const OUT_DIR = join(import.meta.dirname, "../../.out");
 const FONTS_DATA_ROOT = join(import.meta.dirname, "../../../fonts");
@@ -51,39 +53,66 @@ async function ingestAll(limit: number | undefined) {
 
   const limitConcurrency = pLimit(CONCURRENCY);
 
+  const rowsByTarget = new Map<string, FamilyRows>();
+  const parseFailures: { familyDir: string; error: string }[] = [];
   await Promise.all(
     targets.map(({ license, familyDir }) =>
       limitConcurrency(async () => {
         try {
-          const { family, variants, subsets } = await loadFamilyRows(
-            license,
-            familyDir,
-          );
-          const converted = await convertFamilyFiles(
-            license,
-            familyDir,
-            s3Client,
-          );
-          statements.push(
-            ...buildFamilyStatements(family, variants, subsets),
-            ...buildFileStatements(converted),
-          );
+          rowsByTarget.set(familyDir, await loadFamilyRows(license, familyDir));
         } catch (error) {
-          failures.push({
+          parseFailures.push({
             familyDir,
             error: error instanceof Error ? error.message : String(error),
           });
-        } finally {
-          completed += 1;
-          if (completed % 50 === 0) {
-            console.log(
-              `${completed}/${targets.length} families processed (${failures.length} failed)`,
-            );
-          }
         }
       }),
     ),
   );
+  failures.push(...parseFailures);
+
+  const allVariantIds = [...rowsByTarget.values()].flatMap((rows) =>
+    rows.variants.map((variant) => variant.id),
+  );
+  const existingChecksums = await fetchExistingChecksums(allVariantIds);
+
+  await Promise.all(
+    targets
+      .filter(({ familyDir }) => rowsByTarget.has(familyDir))
+      .map(({ license, familyDir }) =>
+        limitConcurrency(async () => {
+          const rows = rowsByTarget.get(familyDir);
+          if (!rows) return;
+          const { family, variants, subsets, fonts, variable } = rows;
+          try {
+            const converted = await convertFamilyFiles(
+              license,
+              familyDir,
+              family,
+              fonts,
+              variable,
+              existingChecksums,
+              s3Client,
+            );
+            statements.push(
+              ...buildFamilyStatements(family, variants, subsets),
+              ...buildFileStatements(converted),
+            );
+          } catch (error) {
+            failures.push({
+              familyDir,
+              error: error instanceof Error ? error.message : String(error),
+            });
+          } finally {
+            completed += 1;
+            process.stdout.write(
+              `\r${completed}/${targets.length} families processed (${failures.length} failed)`,
+            );
+          }
+        }),
+      ),
+  );
+  process.stdout.write("\n");
 
   console.log(
     `done: ${completed - failures.length} succeeded, ${failures.length} failed`,
@@ -104,11 +133,22 @@ async function ingestOne(
 ) {
   const s3Client = createR2Client();
 
-  const { family, variants, subsets } = await loadFamilyRows(
+  const { family, variants, subsets, fonts, variable } = await loadFamilyRows(
     license,
     familyDir,
   );
-  const converted = await convertFamilyFiles(license, familyDir, s3Client);
+  const existingChecksums = await fetchExistingChecksums(
+    variants.map((variant) => variant.id),
+  );
+  const converted = await convertFamilyFiles(
+    license,
+    familyDir,
+    family,
+    fonts,
+    variable,
+    existingChecksums,
+    s3Client,
+  );
 
   const statements = [
     ...buildSeedLicensesStatements(),

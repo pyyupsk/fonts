@@ -30,20 +30,31 @@ export async function queryD1<T>(sql: string, params: unknown[]): Promise<T[]> {
   return json.result[0]?.results ?? [];
 }
 
+const MAX_VARIANT_IDS_PER_QUERY = 100;
+
 export async function fetchExistingChecksums(
   variantIds: string[],
 ): Promise<Map<string, string>> {
   if (variantIds.length === 0) return new Map();
 
-  const placeholders = variantIds.map(() => "?").join(",");
-  const rows = await queryD1<{
-    variant_id: string;
-    source_checksum_sha256: string;
-  }>(
-    `SELECT variant_id, source_checksum_sha256 FROM files WHERE variant_id IN (${placeholders})`,
-    variantIds,
-  );
-  return new Map(
-    rows.map((row) => [row.variant_id, row.source_checksum_sha256]),
-  );
+  const result = new Map<string, string>();
+  for (
+    let offset = 0;
+    offset < variantIds.length;
+    offset += MAX_VARIANT_IDS_PER_QUERY
+  ) {
+    const chunk = variantIds.slice(offset, offset + MAX_VARIANT_IDS_PER_QUERY);
+    const placeholders = chunk.map(() => "?").join(",");
+    const rows = await queryD1<{
+      variant_id: string;
+      source_checksum_sha256: string;
+    }>(
+      `SELECT variant_id, source_checksum_sha256 FROM files WHERE variant_id IN (${placeholders})`,
+      chunk,
+    );
+    for (const row of rows) {
+      result.set(row.variant_id, row.source_checksum_sha256);
+    }
+  }
+  return result;
 }
