@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FontRow } from "@/components/font/font-row";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -70,13 +70,13 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
     readBoolParam("variable"),
   );
 
-  function toggleWeight(value: string) {
+  const toggleWeight = useCallback((value: string) => {
     setSelectedWeights((previous) =>
       previous.includes(value)
         ? previous.filter((entry) => entry !== value)
         : [...previous, value],
     );
-  }
+  }, []);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -192,7 +192,7 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
     return () => observer.disconnect();
   }, [hasMore]);
 
-  function clearAll() {
+  const clearAll = useCallback(() => {
     setSearch("");
     setCategory(ALL);
     setLicense(ALL);
@@ -200,7 +200,7 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
     setSelectedWeights([]);
     setSubset(ALL);
     setVariableOnly(false);
-  }
+  }, []);
 
   const activeFilters = [
     category !== ALL && {

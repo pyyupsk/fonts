@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { loadFont } from "@/lib/load-font";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -15,7 +15,7 @@ interface FontRowProps {
 const STAGGER_STEP_MS = 60;
 const STAGGER_SLOTS = 10;
 
-export function FontRow({
+export const FontRow = memo(function FontRow({
   familyId,
   defaultFileUrl,
   name,
@@ -82,4 +82,4 @@ export function FontRow({
       </span>
     </a>
   );
-}
+});

@@ -1,4 +1,5 @@
 import { Select as BaseSelect } from "@base-ui/react/select";
+import { memo } from "react";
 
 export interface SelectOption {
   value: string;
@@ -13,7 +14,7 @@ interface SelectProps {
   ariaLabel: string;
 }
 
-export function Select({
+export const Select = memo(function Select({
   keyLabel,
   value,
   onChange,
@@ -59,4 +60,4 @@ export function Select({
       </BaseSelect.Portal>
     </BaseSelect.Root>
   );
-}
+});
