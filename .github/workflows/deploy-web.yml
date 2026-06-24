@@ -32,6 +32,7 @@ jobs:
         run: bun run build
         env:
           API_BASE: ${{ secrets.WEB_API_BASE }}
+          PUBLIC_API_BASE: ${{ secrets.WEB_PUBLIC_API_BASE }}
 
       - name: Deploy to Cloudflare
         working-directory: apps/web
