@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import { FontsTooltip } from "@/components/brand/fonts-tooltip.tsx";
 import { CatalogFilter } from "@/components/catalog/catalog-filter.tsx";
 import type { CatalogEntry } from "@/components/catalog/catalog-filter.tsx";
 import { getAllFamilies, getAllFamilyDetails } from "@/lib/build-data";
@@ -43,7 +44,8 @@ const catalog: CatalogEntry[] = families.map((family) => {
       <h1
         class="font-display text-display font-normal leading-[0.95] tracking-[-0.02em] text-balance"
       >
-        Fonts <span class="text-heading text-paper-muted">by pyyupsk</span>
+        <FontsTooltip client:load />
+        <span class="text-heading text-paper-muted">curated by pyyupsk</span>
       </h1>
       <span class="flex flex-wrap gap-md text-label">
         <a
