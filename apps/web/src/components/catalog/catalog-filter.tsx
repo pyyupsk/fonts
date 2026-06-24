@@ -1,3 +1,5 @@
+import { Checkbox } from "@base-ui/react/checkbox";
+import { Tooltip } from "@base-ui/react/tooltip";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FontRow } from "@/components/font/font-row";
 import { Input } from "@/components/ui/input";
@@ -16,6 +18,7 @@ export interface CatalogEntry {
   weights: number[];
   styles: string[];
   subsets: string[];
+  isVariable: boolean;
 }
 
 interface CatalogFilterProps {
@@ -26,6 +29,21 @@ function readParam(name: string): string {
   if (globalThis.window === undefined) return ALL;
   return (
     new URLSearchParams(globalThis.window.location.search).get(name) ?? ALL
+  );
+}
+
+function readListParam(name: string): string[] {
+  if (globalThis.window === undefined) return [];
+  const value = new URLSearchParams(globalThis.window.location.search).get(
+    name,
+  );
+  return value ? value.split(",") : [];
+}
+
+function readBoolParam(name: string): boolean {
+  if (globalThis.window === undefined) return false;
+  return (
+    new URLSearchParams(globalThis.window.location.search).get(name) === "1"
   );
 }
 
@@ -44,8 +62,21 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
   const [category, setCategory] = useState(() => readParam("category"));
   const [license, setLicense] = useState(() => readParam("license"));
   const [style, setStyle] = useState(() => readParam("style"));
-  const [weight, setWeight] = useState(() => readParam("weight"));
+  const [selectedWeights, setSelectedWeights] = useState<string[]>(() =>
+    readListParam("weight"),
+  );
   const [subset, setSubset] = useState(() => readParam("subset"));
+  const [variableOnly, setVariableOnly] = useState(() =>
+    readBoolParam("variable"),
+  );
+
+  function toggleWeight(value: string) {
+    setSelectedWeights((previous) =>
+      previous.includes(value)
+        ? previous.filter((entry) => entry !== value)
+        : [...previous, value],
+    );
+  }
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -54,14 +85,16 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
     if (category !== ALL) params.set("category", category);
     if (license !== ALL) params.set("license", license);
     if (style !== ALL) params.set("style", style);
-    if (weight !== ALL) params.set("weight", weight);
+    if (selectedWeights.length > 0)
+      params.set("weight", selectedWeights.join(","));
     if (subset !== ALL) params.set("subset", subset);
+    if (variableOnly) params.set("variable", "1");
     const queryString = params.toString();
     const url = queryString
       ? `?${queryString}`
       : globalThis.window.location.pathname;
     globalThis.window.history.replaceState(null, "", url);
-  }, [search, category, license, style, weight, subset]);
+  }, [search, category, license, style, selectedWeights, subset, variableOnly]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -110,12 +143,27 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
       if (category !== ALL && entry.category !== category) return false;
       if (license !== ALL && entry.license !== license) return false;
       if (style !== ALL && !entry.styles.includes(style)) return false;
-      if (weight !== ALL && !entry.weights.includes(Number(weight)))
+      if (
+        selectedWeights.length > 0 &&
+        !entry.weights.some((entryWeight) =>
+          selectedWeights.includes(String(entryWeight)),
+        )
+      )
         return false;
       if (subset !== ALL && !entry.subsets.includes(subset)) return false;
+      if (variableOnly && !entry.isVariable) return false;
       return true;
     });
-  }, [catalog, search, category, license, style, weight, subset]);
+  }, [
+    catalog,
+    search,
+    category,
+    license,
+    style,
+    selectedWeights,
+    subset,
+    variableOnly,
+  ]);
 
   const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
   useEffect(() => {
@@ -148,105 +196,142 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
     setCategory(ALL);
     setLicense(ALL);
     setStyle(ALL);
-    setWeight(ALL);
+    setSelectedWeights([]);
     setSubset(ALL);
+    setVariableOnly(false);
   }
 
   const activeFilters = [
     category !== ALL && {
       key: "category" as const,
-      label: category,
+      label: `category: ${category}`,
       clear: () => setCategory(ALL),
     },
     license !== ALL && {
       key: "license" as const,
-      label: license,
+      label: `license: ${license}`,
       clear: () => setLicense(ALL),
     },
     style !== ALL && {
       key: "style" as const,
-      label: style,
+      label: `style: ${style}`,
       clear: () => setStyle(ALL),
     },
-    weight !== ALL && {
-      key: "weight" as const,
-      label: weight,
-      clear: () => setWeight(ALL),
-    },
+    ...selectedWeights.map((value) => ({
+      key: `weight-${value}` as const,
+      label: `weight: ${value}`,
+      clear: () => toggleWeight(value),
+    })),
     subset !== ALL && {
       key: "subset" as const,
-      label: subset,
+      label: `subset: ${subset}`,
       clear: () => setSubset(ALL),
     },
-  ].filter(
-    (
-      filter,
-    ): filter is {
-      key: "category" | "license" | "style" | "weight" | "subset";
-      label: string;
-      clear: () => void;
-    } => Boolean(filter),
+    variableOnly && {
+      key: "variable" as const,
+      label: "variable",
+      clear: () => setVariableOnly(false),
+    },
+  ].filter((filter): filter is Exclude<typeof filter, false> =>
+    Boolean(filter),
   );
 
   return (
     <div>
       <div className="sticky top-0 z-sticky bg-ink pt-md pb-sm">
-        <div className="flex flex-wrap items-center gap-sm mb-sm">
+        <div className="border-b border-ink-border pb-sm mb-sm">
           <Input
             ref={searchInputRef}
-            className="flex-1 basis-64"
+            className="w-full mb-sm"
             type="search"
-            placeholder="Search fonts… (press / to focus)"
+            placeholder="Search fonts…"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             aria-label="Search fonts"
           />
-          <div className="flex flex-wrap gap-xs">
+          <div className="flex flex-wrap gap-lg">
             <Select
+              keyLabel="category"
               ariaLabel="Category"
               value={category}
               onChange={setCategory}
-              options={[
-                { value: ALL, label: "All categories" },
-                ...toOptions(categories),
-              ]}
+              options={[{ value: ALL, label: "all" }, ...toOptions(categories)]}
             />
             <Select
+              keyLabel="license"
               ariaLabel="License"
               value={license}
               onChange={setLicense}
-              options={[
-                { value: ALL, label: "All licenses" },
-                ...toOptions(licenses),
-              ]}
+              options={[{ value: ALL, label: "all" }, ...toOptions(licenses)]}
             />
             <Select
+              keyLabel="style"
               ariaLabel="Style"
               value={style}
               onChange={setStyle}
-              options={[
-                { value: ALL, label: "All styles" },
-                ...toOptions(styles),
-              ]}
+              options={[{ value: ALL, label: "all" }, ...toOptions(styles)]}
             />
             <Select
-              ariaLabel="Weight"
-              value={weight}
-              onChange={setWeight}
-              options={[
-                { value: ALL, label: "All weights" },
-                ...toOptions(weights.map(String)),
-              ]}
-            />
-            <Select
+              keyLabel="subset"
               ariaLabel="Subset"
               value={subset}
               onChange={setSubset}
-              options={[
-                { value: ALL, label: "All subsets" },
-                ...toOptions(subsets),
-              ]}
+              options={[{ value: ALL, label: "all" }, ...toOptions(subsets)]}
             />
+            <div className="inline-flex items-baseline gap-2xs text-label text-paper-muted">
+              <span>weight</span>
+              <div className="inline-flex gap-xs">
+                {weights.map((entryWeight) => {
+                  const value = String(entryWeight);
+                  return (
+                    <label
+                      key={value}
+                      aria-disabled={variableOnly}
+                      className="cursor-pointer border-b border-dotted border-paper-muted text-paper transition-colors duration-fast ease-out-quart has-data-checked:border-accent has-data-checked:text-accent hover:border-paper has-data-disabled:cursor-not-allowed has-data-disabled:text-paper-muted has-data-disabled:hover:border-paper-muted"
+                    >
+                      <Checkbox.Root
+                        checked={selectedWeights.includes(value)}
+                        onCheckedChange={() => toggleWeight(value)}
+                        disabled={variableOnly}
+                        className="sr-only"
+                      />
+                      {value}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+            <label className="group inline-flex items-baseline gap-2xs cursor-pointer text-label text-paper-muted">
+              <Checkbox.Root
+                checked={variableOnly}
+                onCheckedChange={(checked) => {
+                  setVariableOnly(checked);
+                  if (checked) setSelectedWeights([]);
+                }}
+                className="sr-only"
+              />
+              <Tooltip.Provider delay={0}>
+                <Tooltip.Root>
+                  <Tooltip.Trigger
+                    render={
+                      <span className="border-b border-dotted border-paper-muted text-paper-muted transition-colors duration-fast ease-out-quart group-has-data-checked:border-accent group-has-data-checked:text-accent group-hover:text-paper" />
+                    }
+                  >
+                    variable
+                  </Tooltip.Trigger>
+                  <Tooltip.Portal>
+                    <Tooltip.Positioner sideOffset={8} className="z-tooltip">
+                      <Tooltip.Popup className="max-w-64 rounded border border-ink-border bg-ink-raised px-sm py-xs text-label text-paper">
+                        <Tooltip.Arrow className="fill-ink-raised" />
+                        Variable fonts pack a continuous weight range (e.g.
+                        100–900) into one file, instead of separate files per
+                        weight.
+                      </Tooltip.Popup>
+                    </Tooltip.Positioner>
+                  </Tooltip.Portal>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+            </label>
           </div>
         </div>
 
@@ -260,7 +345,7 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
               key={filter.key}
               type="button"
               onClick={filter.clear}
-              className="flex items-center gap-2xs rounded border border-ink-border bg-ink-raised px-sm py-2xs text-label text-paper transition-colors duration-fast ease-out-quart hover:text-accent"
+              className="flex items-center gap-2xs text-label text-paper underline transition-colors duration-fast ease-out-quart hover:text-accent"
             >
               {filter.label}
               <span aria-hidden="true">×</span>

@@ -25,6 +25,10 @@ const catalog: CatalogEntry[] = families.map((family) => {
     weights: [...new Set(variants.map((variant) => variant.weight))],
     styles: [...new Set(variants.map((variant) => variant.style))],
     subsets: detail?.subsets.map((subset) => subset.name) ?? [],
+    isVariable:
+      family.wghtMin !== null &&
+      family.wghtMax !== null &&
+      family.wghtMin < family.wghtMax,
   };
 });
 ---

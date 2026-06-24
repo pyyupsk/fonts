@@ -4,7 +4,7 @@ import type { ComponentProps } from "react";
 type InputProps = Readonly<ComponentProps<typeof BaseInput>>;
 
 const BASE_CLASSES =
-  "h-9 bg-ink-raised border border-ink-border rounded text-paper font-sans placeholder:text-paper-muted px-md transition-colors duration-fast ease-out-quart focus-visible:border-accent";
+  "bg-transparent border-none text-paper font-display text-heading font-normal placeholder:text-paper-muted py-2xs outline-none";
 
 export function Input(props: InputProps) {
   return (

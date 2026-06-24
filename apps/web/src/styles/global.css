@@ -32,6 +32,7 @@
 
   --z-index-sticky: 10;
   --z-index-dropdown: 20;
+  --z-index-tooltip: 30;
 }
 
 @font-face {
