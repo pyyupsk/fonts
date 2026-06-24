@@ -47,8 +47,8 @@ function readBoolParam(name: string): boolean {
   );
 }
 
-function uniqueSorted<T>(values: T[]): T[] {
-  return [...new Set(values)].sort();
+function uniqueSorted<T>(values: T[], compareFn?: (a: T, b: T) => number): T[] {
+  return [...new Set(values)].sort(compareFn);
 }
 
 function toOptions(values: string[]): { value: string; label: string }[] {
@@ -126,7 +126,8 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
   );
   const weights = useMemo(
     () =>
-      [...new Set(catalog.flatMap((entry) => entry.weights))].sort(
+      uniqueSorted(
+        catalog.flatMap((entry) => entry.weights),
         (a, b) => a - b,
       ),
     [catalog],
