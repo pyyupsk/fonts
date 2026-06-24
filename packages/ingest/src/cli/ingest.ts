@@ -115,7 +115,7 @@ async function ingestAll(limit: number | undefined) {
   process.stdout.write("\n");
 
   console.log(
-    `done: ${completed - failures.length} succeeded, ${failures.length} failed`,
+    `done: ${targets.length - failures.length} succeeded, ${failures.length} failed`,
   );
   for (const failure of failures) {
     console.log(`  failed: ${failure.familyDir} — ${failure.error}`);
