@@ -5,7 +5,9 @@ import { CatalogFilter } from "@/components/catalog/catalog-filter.tsx";
 import type { CatalogEntry } from "@/components/catalog/catalog-filter.tsx";
 import { getAllFamilies, getAllFamilyDetails } from "@/lib/build-data";
 
-const families = await getAllFamilies();
+const families = (await getAllFamilies()).sort((a, b) =>
+  a.name.localeCompare(b.name, "en", { numeric: true }),
+);
 const details = await getAllFamilyDetails();
 
 const catalog: CatalogEntry[] = families.map((family) => {
