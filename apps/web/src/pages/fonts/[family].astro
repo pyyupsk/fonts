@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { BackLink } from "@/components/nav/back-link";
-import { EmbedSnippet } from "@/components/font/embed-snippet";
+import { CodeBlock } from "@/components/ui/code-block";
 import { FontSpecimenList } from "@/components/font/font-specimen-list";
 import { buildEmbedSnippet } from "@/lib/build-embed-snippet";
 import { getAllFamilies, getAllFamilyDetails } from "@/lib/build-data";
@@ -9,7 +9,7 @@ import {
   previewFontFamilyName,
   variableFontFamilyName,
 } from "@/lib/font-family-name";
-import { highlightCss } from "@/lib/highlight-css";
+import { highlightCss } from "@/lib/highlighter";
 
 export async function getStaticPaths() {
   const families = await getAllFamilies();
@@ -181,7 +181,7 @@ const embedSnippets = await Promise.all(
                   Download .woff2 ↓
                 </a>
               </div>
-              <EmbedSnippet
+              <CodeBlock
                 client:load
                 code={snippet.code}
                 highlightedHtml={snippet.highlightedHtml}

@@ -1,14 +1,11 @@
 import { useState } from "react";
 
-interface EmbedSnippetProps {
+interface CodeBlockProps {
   code: string;
   highlightedHtml: string;
 }
 
-export function EmbedSnippet({
-  code,
-  highlightedHtml,
-}: Readonly<EmbedSnippetProps>) {
+export function CodeBlock({ code, highlightedHtml }: Readonly<CodeBlockProps>) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {

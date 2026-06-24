@@ -1,0 +1,186 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { BackLink } from "@/components/nav/back-link";
+import { EmbedTabs } from "@/components/docs/embed-tabs";
+import { CodeBlock } from "@/components/ui/code-block";
+import { highlightCss, highlightJson } from "@/lib/highlighter";
+
+const description =
+  "Self-host any font from the catalog via @font-face, or query the catalog programmatically via the REST API.";
+
+const API_BASE = "https://fonts-api.fasu.dev";
+
+const embedExample = `@font-face {
+  font-family: "Inter";
+  src: url("https://cdn.fasu.dev/fonts/ofl/inter/inter-normal-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}`;
+
+const variableEmbedExample = `@font-face {
+  font-family: "Inter";
+  src: url("https://cdn.fasu.dev/fonts/ofl/inter/inter-normal-variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+}`;
+
+const [embedHtml, variableEmbedHtml] = await Promise.all([
+  highlightCss(embedExample),
+  highlightCss(variableEmbedExample),
+]);
+
+const endpoints = [
+  {
+    method: "GET",
+    path: "/api/fonts",
+    description: "List families, optionally filtered.",
+    params: [
+      [
+        "category",
+        "string",
+        "e.g. sans-serif, serif, display, handwriting, monospace",
+      ],
+      ["license", "string", "ofl | apache | ufl"],
+      ["search", "string", "match against family name"],
+    ],
+    response: `{
+  "families": [
+    {
+      "id": "inter",
+      "name": "Inter",
+      "designer": "Rasmus Andersson",
+      "category": "sans-serif",
+      "license": "ofl",
+      "isNoto": false,
+      "dateAdded": "2017-10-08",
+      "sourceRepositoryUrl": "https://github.com/rsms/inter",
+      "licenseUrl": "https://...",
+      "wghtMin": 100,
+      "wghtMax": 900
+    }
+  ]
+}`,
+  },
+  {
+    method: "GET",
+    path: "/api/fonts/full",
+    description:
+      "All families with their variants and subsets in one call. Used by this site's build step — heaviest endpoint, prefer caching the result.",
+    params: [],
+    response: `{
+  "families": [
+    {
+      "family": { "id": "inter", "name": "Inter", "...": "..." },
+      "variants": [
+        {
+          "id": "inter-400-normal",
+          "familyId": "inter",
+          "style": "normal",
+          "weight": 400,
+          "postScriptName": "Inter-Regular",
+          "fileUrl": "https://cdn.fasu.dev/fonts/ofl/inter/inter-normal-400.woff2"
+        }
+      ],
+      "subsets": [{ "id": "latin", "name": "Latin" }]
+    }
+  ]
+}`,
+  },
+  {
+    method: "GET",
+    path: "/api/fonts/:family",
+    description:
+      "Single family by id, with variants and subsets. 404 if unknown.",
+    params: [["family", "string (path)", "family id, e.g. inter"]],
+    response: `{
+  "family": { "id": "inter", "name": "Inter", "...": "..." },
+  "variants": [
+    {
+      "id": "inter-400-normal",
+      "familyId": "inter",
+      "style": "normal",
+      "weight": 400,
+      "postScriptName": "Inter-Regular",
+      "fileUrl": "https://cdn.fasu.dev/fonts/ofl/inter/inter-normal-400.woff2"
+    }
+  ],
+  "subsets": [{ "id": "latin", "name": "Latin" }]
+}`,
+  },
+];
+
+const endpointHtml = await Promise.all(
+  endpoints.map((endpoint) =>
+    highlightJson(endpoint.response).then((html) => ({ ...endpoint, html })),
+  ),
+);
+---
+
+<BaseLayout title="Docs — Fonts" description={description}>
+  <BackLink client:load />
+  <h1
+    class="font-display text-display font-normal leading-[0.95] tracking-[-0.02em] mt-sm mb-md"
+  >
+    Docs
+  </h1>
+  <p class="text-paper-muted mb-2xl max-w-prose">{description}</p>
+
+  <section class="mb-2xl">
+    <h2 class="text-heading font-display font-normal mb-md">
+      Self-hosting a font
+    </h2>
+    <p class="text-paper-muted mb-md max-w-prose">
+      Every variant is served as a standalone <code>.woff2</code> file from our CDN.
+      Copy the <code>@font-face</code> block from any family page, or use the pattern
+      below — static weight on the left, variable range on the right.
+    </p>
+    <EmbedTabs
+      client:load
+      staticCode={embedExample}
+      staticHtml={embedHtml}
+      variableCode={variableEmbedExample}
+      variableHtml={variableEmbedHtml}
+    />
+  </section>
+
+  <section class="mb-2xl">
+    <h2 class="text-heading font-display font-normal mb-md">REST API</h2>
+    <p class="text-paper-muted mb-md max-w-prose">
+      Public, no auth, CORS open. Base URL:
+    </p>
+    <p class="mb-lg">
+      <code class="text-paper">{API_BASE}</code>
+    </p>
+
+    <div class="border-t border-ink-border">
+      {
+        endpointHtml.map((endpoint) => (
+          <div class="py-lg border-b border-ink-border">
+            <p class="text-label mb-2xs">
+              <span class="text-accent">{endpoint.method}</span>{" "}
+              <span class="text-paper">{endpoint.path}</span>
+            </p>
+            <p class="text-paper-muted mb-sm max-w-prose">
+              {endpoint.description}
+            </p>
+            {endpoint.params.length > 0 && (
+              <ul class="flex flex-col gap-2xs mb-sm text-label">
+                {endpoint.params.map(([name, type, note]) => (
+                  <li class="text-paper-muted">
+                    <span class="text-paper">{name}</span>{" "}
+                    <span class="text-paper-muted">({type})</span> — {note}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <CodeBlock
+              client:load
+              code={endpoint.response}
+              highlightedHtml={endpoint.html}
+            />
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
