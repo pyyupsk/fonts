@@ -1,6 +1,17 @@
 # fonts
 
+> A self-hosted, open-license type catalog. Browse, compare, and grab the file.
+
 Self-hosted, editorial alternative to Google Fonts — serves ~2015 open-license font families (OFL/Apache/UFL) with metadata, previews, and CDN-delivered files via Cloudflare D1 + R2.
+
+## Why
+
+Not the biggest catalog (Google) or the slickest npm packaging (Fontsource) — built on **taste-as-feature**: the site's own design is the proof of curation quality.
+
+- **Editorial discovery** — live `@font-face` previews, variable-axis sliders, side-by-side compare.
+- **Self-hosted, zero tracking** — files direct from the CDN (R2), immutable 1-year cache.
+- **Grab-the-file** — per-variant `.woff2` + copy-paste `@font-face` on every family page.
+- **Public REST API** — `/api/fonts`, `/full`, `/:family`; CORS-open, no auth.
 
 ## Layout
 
