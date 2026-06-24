@@ -14,6 +14,10 @@ export default defineConfig({
   env: {
     schema: {
       API_BASE: envField.string({ context: "server", access: "secret" }),
+      PUBLIC_API_BASE: envField.string({
+        context: "server",
+        access: "public",
+      }),
     },
   },
   vite: {
