@@ -1,9 +1,9 @@
-import { Checkbox } from "@base-ui/react/checkbox";
-import { Tooltip } from "@base-ui/react/tooltip";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FontRow } from "@/components/font/font-row";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { Tooltip } from "@/components/ui/tooltip";
 
 const BATCH_SIZE = 10;
 const ALL = "all";
@@ -289,11 +289,10 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
                       aria-disabled={variableOnly}
                       className="cursor-pointer border-b border-dotted border-paper-muted text-paper transition-colors duration-fast ease-out-quart has-data-checked:border-accent has-data-checked:text-accent hover:border-paper has-data-disabled:cursor-not-allowed has-data-disabled:text-paper-muted has-data-disabled:hover:border-paper-muted"
                     >
-                      <Checkbox.Root
+                      <Checkbox
                         checked={selectedWeights.includes(value)}
                         onCheckedChange={() => toggleWeight(value)}
                         disabled={variableOnly}
-                        className="sr-only"
                       />
                       {value}
                     </label>
@@ -302,35 +301,22 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
               </div>
             </div>
             <label className="group inline-flex items-baseline gap-2xs cursor-pointer text-label text-paper-muted">
-              <Checkbox.Root
+              <Checkbox
                 checked={variableOnly}
                 onCheckedChange={(checked) => {
                   setVariableOnly(checked);
                   if (checked) setSelectedWeights([]);
                 }}
-                className="sr-only"
               />
-              <Tooltip.Provider delay={0}>
-                <Tooltip.Root>
-                  <Tooltip.Trigger
-                    render={
-                      <span className="border-b border-dotted border-paper-muted text-paper-muted transition-colors duration-fast ease-out-quart group-has-data-checked:border-accent group-has-data-checked:text-accent group-hover:text-paper" />
-                    }
-                  >
-                    variable
-                  </Tooltip.Trigger>
-                  <Tooltip.Portal>
-                    <Tooltip.Positioner sideOffset={8} className="z-tooltip">
-                      <Tooltip.Popup className="max-w-64 rounded border border-ink-border bg-ink-raised px-sm py-xs text-label text-paper">
-                        <Tooltip.Arrow className="fill-ink-raised" />
-                        Variable fonts pack a continuous weight range (e.g.
-                        100–900) into one file, instead of separate files per
-                        weight.
-                      </Tooltip.Popup>
-                    </Tooltip.Positioner>
-                  </Tooltip.Portal>
-                </Tooltip.Root>
-              </Tooltip.Provider>
+              <Tooltip
+                delay={0}
+                content="Variable fonts pack a continuous weight range (e.g. 100–900) into one file, instead of separate files per weight."
+                render={
+                  <span className="border-b border-dotted border-paper-muted text-paper-muted transition-colors duration-fast ease-out-quart group-has-data-checked:border-accent group-has-data-checked:text-accent group-hover:text-paper" />
+                }
+              >
+                variable
+              </Tooltip>
             </label>
           </div>
         </div>
