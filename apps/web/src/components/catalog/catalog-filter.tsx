@@ -44,6 +44,8 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
   const [category, setCategory] = useState(() => readParam("category"));
   const [license, setLicense] = useState(() => readParam("license"));
   const [style, setStyle] = useState(() => readParam("style"));
+  const [weight, setWeight] = useState(() => readParam("weight"));
+  const [subset, setSubset] = useState(() => readParam("subset"));
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -52,12 +54,14 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
     if (category !== ALL) params.set("category", category);
     if (license !== ALL) params.set("license", license);
     if (style !== ALL) params.set("style", style);
+    if (weight !== ALL) params.set("weight", weight);
+    if (subset !== ALL) params.set("subset", subset);
     const queryString = params.toString();
     const url = queryString
       ? `?${queryString}`
       : globalThis.window.location.pathname;
     globalThis.window.history.replaceState(null, "", url);
-  }, [search, category, license, style]);
+  }, [search, category, license, style, weight, subset]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -87,6 +91,17 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
     () => uniqueSorted(catalog.flatMap((entry) => entry.styles)),
     [catalog],
   );
+  const weights = useMemo(
+    () =>
+      [...new Set(catalog.flatMap((entry) => entry.weights))].sort(
+        (a, b) => a - b,
+      ),
+    [catalog],
+  );
+  const subsets = useMemo(
+    () => uniqueSorted(catalog.flatMap((entry) => entry.subsets)),
+    [catalog],
+  );
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -95,9 +110,12 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
       if (category !== ALL && entry.category !== category) return false;
       if (license !== ALL && entry.license !== license) return false;
       if (style !== ALL && !entry.styles.includes(style)) return false;
+      if (weight !== ALL && !entry.weights.includes(Number(weight)))
+        return false;
+      if (subset !== ALL && !entry.subsets.includes(subset)) return false;
       return true;
     });
-  }, [catalog, search, category, license, style]);
+  }, [catalog, search, category, license, style, weight, subset]);
 
   const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
   useEffect(() => {
@@ -130,6 +148,8 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
     setCategory(ALL);
     setLicense(ALL);
     setStyle(ALL);
+    setWeight(ALL);
+    setSubset(ALL);
   }
 
   const activeFilters = [
@@ -148,11 +168,21 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
       label: style,
       clear: () => setStyle(ALL),
     },
+    weight !== ALL && {
+      key: "weight" as const,
+      label: weight,
+      clear: () => setWeight(ALL),
+    },
+    subset !== ALL && {
+      key: "subset" as const,
+      label: subset,
+      clear: () => setSubset(ALL),
+    },
   ].filter(
     (
       filter,
     ): filter is {
-      key: "category" | "license" | "style";
+      key: "category" | "license" | "style" | "weight" | "subset";
       label: string;
       clear: () => void;
     } => Boolean(filter),
@@ -197,6 +227,24 @@ export function CatalogFilter({ catalog }: Readonly<CatalogFilterProps>) {
               options={[
                 { value: ALL, label: "All styles" },
                 ...toOptions(styles),
+              ]}
+            />
+            <Select
+              ariaLabel="Weight"
+              value={weight}
+              onChange={setWeight}
+              options={[
+                { value: ALL, label: "All weights" },
+                ...toOptions(weights.map(String)),
+              ]}
+            />
+            <Select
+              ariaLabel="Subset"
+              value={subset}
+              onChange={setSubset}
+              options={[
+                { value: ALL, label: "All subsets" },
+                ...toOptions(subsets),
               ]}
             />
           </div>
