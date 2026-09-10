@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { copyFile, mkdir, readFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rm } from "node:fs/promises";
 import { cpus } from "node:os";
 import { join } from "node:path";
 import { PutObjectCommand, type S3Client } from "@aws-sdk/client-s3";
@@ -79,6 +79,9 @@ export async function convertFamilyFiles(
         }),
       );
 
+      await rm(ttfCopyPath, { force: true });
+      await rm(woff2Path, { force: true });
+
       return {
         variantId,
         r2Key,
@@ -88,6 +91,8 @@ export async function convertFamilyFiles(
       };
     }),
   );
+
+  await rm(outDir, { recursive: true, force: true });
 
   return results.filter((file): file is ConvertedFile => file !== undefined);
 }
