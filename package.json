@@ -7,7 +7,7 @@
   ],
   "packageManager": "bun@1.4.1",
   "resolutions": {
-    "vite": "7.3.5"
+    "vite": "8.3.8"
   },
   "scripts": {
     "build": "turbo run build",
