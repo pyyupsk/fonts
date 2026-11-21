@@ -9,7 +9,12 @@ import { defineConfig, envField } from "astro/config";
 export default defineConfig({
   site: "https://fonts.fasu.dev",
   output: "static",
-  adapter: cloudflare({ imageService: "compile" }),
+  // keep Astro 6 HTML-aware whitespace; v7 default "jsx" drops spaces between inline elements
+  compressHTML: true,
+  adapter: cloudflare({
+    imageService: "compile",
+    prerenderEnvironment: "node",
+  }),
   integrations: [react(), sitemap()],
   env: {
     schema: {
